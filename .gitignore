@@ -1,0 +1,10 @@
+# Local environment files
+node_modules/
+.vscode/
+
+# Common build outputs
+dist/
+coverage/
+
+# OS files
+.DS_Store
