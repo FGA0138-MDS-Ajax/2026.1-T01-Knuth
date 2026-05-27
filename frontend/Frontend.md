@@ -30,9 +30,9 @@ npm -v
 
 O frontend fica na pasta:
 
-```text
+
 frontend/
-```
+
 
 É dentro dessa pasta que você deve rodar os comandos de instalação e execução.
 
@@ -43,7 +43,7 @@ frontend/
 No Windows, você pode abrir o PowerShell ou o terminal do VS Code e entrar na pasta do frontend:
 
 ```bash
-cd "c:\Users\Leonardo\Documents\2026.1-T01-Knuth\frontend"
+cd "c:\seu-computador\\frontend"
 ```
 
 ### 2. Instalar as dependências
@@ -80,13 +80,13 @@ Abra o endereço mostrado no terminal, normalmente:
 
 - `http://localhost:5173/`
 - `http://localhost:5173/login`
-- `http://localhost:5173/home`
+- `http://localhost:5173/register`
 
 ## O que cada rota faz hoje
 
 - `/` redireciona para `/login`.
-- `/login` mostra a tela de autenticação.
-- `/home` mostra uma tela simples de exemplo.
+- `/login` mostra a tela de login.
+- `/register` mostra uma tela simples de registro.
 - qualquer rota desconhecida também cai em `/login`.
 
 ## Comandos úteis no dia a dia
@@ -97,74 +97,6 @@ Abra o endereço mostrado no terminal, normalmente:
 npm run dev
 ```
 
-### Gerar build de produção
-
-```bash
-npm run build
-```
-
-Esse comando gera a versão otimizada da aplicação em `dist/`.
-
-### Pré-visualizar a build
-
-```bash
-npm run preview
-```
-
-## Sobre o arquivo `.env`
-
-Hoje, **este frontend ainda não depende de backend**, então **não é obrigatório ter um `.env` agora**.
-
-Mesmo assim, é boa prática preparar o projeto para o futuro. Quando o backend existir, você provavelmente vai usar uma variável como:
-
-```env
-VITE_API_URL=http://localhost:3000
-```
-
-Essa variável serve para apontar o frontend para a API do backend sem precisar alterar o código toda hora.
-
-### Qual arquivo usar
-
-Para projetos Vite, o mais comum é usar:
-
-- `.env.local` para desenvolvimento local
-- `.env.example` para mostrar quais variáveis existem
-
-O arquivo `.env.local` é o ideal para cada pessoa colocar o endereço da sua API sem enviar isso para o Git.
-
-## Exemplo de fluxo quando o backend existir
-
-1. O usuário abre `/login`.
-2. Preenche email e senha.
-3. O frontend envia os dados para a API.
-4. A API valida e responde com sucesso ou erro.
-5. O frontend redireciona o usuário para a área logada.
-
-## Estrutura principal do frontend
-
-- `src/main.jsx` monta a aplicação.
-- `src/App.jsx` define as rotas.
-- `src/components/auth/AuthScreen.jsx` monta a tela de login.
-- `src/components/auth/LoginForms.jsx` renderiza o formulário.
-
-## Problemas comuns e como resolver
-
-### O projeto não abre
-
-- Confira se você rodou `npm install` dentro da pasta `frontend`.
-- Confira se `npm run dev` está rodando sem erro.
-- Veja se a porta `5173` não está sendo usada por outro processo.
-
-### A tela fica em branco
-
-- Abra o console do navegador com `F12`.
-- Veja se existe erro de importação ou erro de rota.
-- Confirme que você acessou `/login`.
-
-### O login não funciona
-
-- Isso é esperado por enquanto se o backend ainda não foi conectado.
-- O foco atual é apenas a tela e a navegação.
 
 ## Resumo rápido
 
