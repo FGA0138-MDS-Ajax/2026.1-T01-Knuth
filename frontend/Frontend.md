@@ -103,7 +103,7 @@ npm run dev
 Se você for pegar este projeto do zero, faça exatamente isto:
 
 ```bash
-cd "c:\Users\Leonardo\Documents\2026.1-T01-Knuth\frontend"
+cd "c:\seu-computador\frontend"
 npm install
 npm run dev
 ```
