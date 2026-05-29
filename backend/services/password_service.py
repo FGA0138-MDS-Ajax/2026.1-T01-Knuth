@@ -1,11 +1,10 @@
 import bcrypt
 
 class PasswordService:
-
     @staticmethod
     def hash_password(password: str) -> str:
-        if not isinstance(password, str):
-            raise TypeError("Password must be a string")
+        if not isinstance(password, str) or not password:
+            raise ValueError("Senha inválida!")
 
         return bcrypt.hashpw(
             password.encode("utf-8"),
@@ -19,5 +18,5 @@ class PasswordService:
                 password.encode("utf-8"),
                 hashed_password.encode("utf-8")
             )
-        except Exception:
+        except (ValueError, TypeError):
             return False
