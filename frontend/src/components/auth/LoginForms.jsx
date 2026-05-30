@@ -1,103 +1,141 @@
-import React, { useState } from 'react';
+import { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { apiUrl } from '../../config/api'
 
 export default function LoginForms() {
-	//const [email, setEmail] = useState('');
-	const [username, setUsername] = useState('');
-	const [password, setPassword] = useState('');
-	const [erro, setErro] = useState('');
-	const [sucesso, setSucesso] = useState('');
-	const [carregando, setCarregando] = useState(false);
+  // Mantemos as rotas do colega
+  const navigate = useNavigate()
+  const location = useLocation()
+  const cadastroSucesso = location.state?.cadastroSucesso
+  
+  // Pegamos a SUA lógica de usar username em vez de e-mail
+  const usernameCadastrado = location.state?.username 
+  const [username, setUsername] = useState(usernameCadastrado ?? '')
+  
+  // Mantemos as melhorias de UI do colega
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [erro, setErro] = useState('')
+  const [carregando, setCarregando] = useState(false)
 
-	async function handleSubmit(event) {
-		event.preventDefault();
+  async function handleSubmit(event) {
+    event.preventDefault()
+    setErro('')
+    setCarregando(true)
 
-		setErro('');
-		setSucesso('');
-		setCarregando(true);
+    try {
+      // Usamos a URL limpa do colega, mas enviamos o SEU pacote com username
+      const resposta = await fetch(apiUrl('/api/login/'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username, password }), 
+      })
 
-		try {
-			const resposta = await fetch('http://127.0.0.1:8000/api/login/', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					username: username,
-					//email: email, //
-					password: password,
-				}),
-			});
+      let dados = {}
+      try {
+        dados = await resposta.json()
+      } catch {
+        throw new Error('Resposta inválida do servidor.')
+      }
 
-			const dados = await resposta.json();
+      if (!resposta.ok) {
+        throw new Error(dados.erro || 'Nome de usuário ou senha inválidos.')
+      }
 
-			if (!resposta.ok) {
-				throw new Error(dados.erro || 'Erro ao fazer login.');
-			}
+      // Redirecionamento configurado pelo colega
+      navigate('/home', { replace: true, state: { usuario: dados.usuario } })
+    } catch (error) {
+      setErro(
+        error.message === 'Failed to fetch'
+          ? 'Não foi possível conectar ao servidor. Verifique se o backend está rodando.'
+          : error.message
+      )
+    } finally {
+      setCarregando(false)
+    }
+  }
 
-			console.log('Login realizado:', dados);
-			setSucesso('Login realizado com sucesso!');
+  return (
+    <form onSubmit={handleSubmit} className="w-full space-y-5">
+      {cadastroSucesso && (
+        <div
+          role="status"
+          className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100"
+        >
+          Conta criada com sucesso! Faça login para continuar.
+        </div>
+      )}
 
-			// Aqui depois vocês podem redirecionar o usuário.
-			// Exemplo, se estiverem usando React Router:
-			// navigate('/dashboard');
+      {/* Trocamos o campo E-mail do colega pelo seu campo de Username */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-emerald-50/90" htmlFor="username">
+          Nome de Usuário
+        </label>
+        <input
+          id="username"
+          type="text"
+          autoComplete="username"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          placeholder="Digite seu usuário"
+          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/60 focus:bg-white/[0.07] focus:ring-2 focus:ring-emerald-400/20"
+          required
+        />
+      </div>
 
-		} catch (error) {
-			console.error('Erro no login:', error);
-			setErro(error.message);
-		} finally {
-			setCarregando(false);
-		}
-	}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-emerald-50/90" htmlFor="password">
+          Senha
+        </label>
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Digite sua senha"
+            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-12 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/60 focus:bg-white/[0.07] focus:ring-2 focus:ring-emerald-400/20"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute inset-y-0 right-0 px-3 text-xs font-medium text-slate-400 transition hover:text-emerald-300"
+            aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+          >
+            {showPassword ? 'Ocultar' : 'Ver'}
+          </button>
+        </div>
+      </div>
 
-	return (
-		<form onSubmit={handleSubmit} className="w-full max-w-sm mt-6">
-			<div className="mb-4">
-				<label className="block text-sm text-gray-200 mb-1" htmlFor="username">
-                    Nome de Usuário
-                </label>
-				<input
-                    id="username"
-                    type="text" 
-                    value={username}
-                    onChange={(event) => setUsername(event.target.value)}
-                    className="w-full px-3 py-2 rounded bg-white/5 text-white border border-white/10"
-                    required
-                />
-			</div>
+      {erro && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200"
+        >
+          {erro}
+        </div>
+      )}
 
-			<div className="mb-6">
-				<label className="block text-sm text-gray-200 mb-1" htmlFor="password">
-					Senha
-				</label>
-				<input
-					id="password"
-					type="password"
-					value={password}
-					onChange={(event) => setPassword(event.target.value)}
-					className="w-full px-3 py-2 rounded bg-white/5 text-white border border-white/10"
-					required
-				/>
-			</div>
+      <button
+        type="submit"
+        disabled={carregando}
+        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-3.5 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <span className="relative z-10">
+          {carregando ? 'Entrando...' : 'Entrar na plataforma'}
+        </span>
+        <span className="absolute inset-0 -translate-x-full bg-white/20 transition group-hover:translate-x-full duration-500" />
+      </button>
 
-			{erro && (
-				<p className="mb-4 text-sm text-red-400">
-					{erro}
-				</p>
-			)}
-
-			{sucesso && (
-				<p className="mb-4 text-sm text-green-400">
-					{sucesso}
-				</p>
-			)}
-
-			<button
-				type="submit"
-				disabled={carregando}
-				className="w-full py-2 bg-blue-600 text-white rounded font-medium disabled:opacity-60"
-			>
-				{carregando ? 'Entrando...' : 'Entrar'}
-			</button>
-		</form>
-	);
+      <p className="text-center text-sm text-slate-400">
+        Ainda não tem conta?{' '}
+        <Link to="/register" className="font-medium text-emerald-300 transition hover:text-emerald-200">
+          Criar conta gratuita
+        </Link>
+      </p>
+    </form>
+  )
 }
