@@ -70,7 +70,7 @@ export default function LoginForms() {
       {/* Trocamos o campo E-mail do colega pelo seu campo de Username */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-emerald-50/90" htmlFor="username">
-          Nome de Usuário
+          E-mail do Usuário
         </label>
         <input
           id="username"
