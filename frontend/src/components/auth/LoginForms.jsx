@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
 export default function LoginForms() {
-	const [email, setEmail] = useState('');
+	//const [email, setEmail] = useState('');
+	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [erro, setErro] = useState('');
 	const [sucesso, setSucesso] = useState('');
@@ -21,7 +22,8 @@ export default function LoginForms() {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					email: email,
+					username: username,
+					//email: email, //
 					password: password,
 				}),
 			});
@@ -50,17 +52,17 @@ export default function LoginForms() {
 	return (
 		<form onSubmit={handleSubmit} className="w-full max-w-sm mt-6">
 			<div className="mb-4">
-				<label className="block text-sm text-gray-200 mb-1" htmlFor="email">
-					Email
-				</label>
+				<label className="block text-sm text-gray-200 mb-1" htmlFor="username">
+                    Nome de Usuário
+                </label>
 				<input
-					id="email"
-					type="email"
-					value={email}
-					onChange={(event) => setEmail(event.target.value)}
-					className="w-full px-3 py-2 rounded bg-white/5 text-white border border-white/10"
-					required
-				/>
+                    id="username"
+                    type="text" 
+                    value={username}
+                    onChange={(event) => setUsername(event.target.value)}
+                    className="w-full px-3 py-2 rounded bg-white/5 text-white border border-white/10"
+                    required
+                />
 			</div>
 
 			<div className="mb-6">

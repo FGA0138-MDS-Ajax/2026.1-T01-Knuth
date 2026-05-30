@@ -10,47 +10,46 @@ from django.views.decorators.http import require_POST
 @csrf_exempt
 @require_POST
 def fazer_login(request):
-    try:
-        data = json.loads(request.body)
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body) #pacote do front
+            usuario_digitado = data.get('username')
+            #email = data.get("email")
+            senha = data.get("senha") or data.get("password")
 
-        email = data.get("email")
-        senha = data.get("senha") or data.get("password")
+            if not usuario_digitado or not senha:
+                return JsonResponse(
+                    {"ok": False, "erro": "Nome de usuario e senha são obrigatórios."},
+                    status=400
+                )
+            usuario = authenticate(username=usuario_digitado, password=senha)
 
-        if not email or not senha:
+            if usuario is None:
+                return JsonResponse(
+                    {"ok": False, "erro": "Nome de usuário ou senha inválidos."},
+                    status=401
+                )
+            login(request, usuario)
+
+            return JsonResponse({
+                "ok": True,
+                "mensagem": "Login realizado com sucesso.",
+                "usuario": {
+                    "id": usuario.id,
+                    "username": usuario.username, # Ajustado para mostrar o username real
+                    "email": usuario.email,
+                }
+            }, status=200)
+        
+        except json.JSONDecodeError:
             return JsonResponse(
-                {"ok": False, "erro": "E-mail e senha são obrigatórios."},
+                {"ok": False, "erro": "JSON inválido. Falha na comunicação."},
                 status=400
             )
 
-        usuario = authenticate(
-            request,
-            username=email,
-            password=senha
-        )
-
-        if usuario is None:
-            return JsonResponse(
-                {"ok": False, "erro": "E-mail ou senha inválidos."},
-                status=401
-            )
-
-        login(request, usuario)
-
-        return JsonResponse({
-            "ok": True,
-            "mensagem": "Login realizado com sucesso.",
-            "usuario": {
-                "id": usuario.id,
-                "nome": usuario.first_name,
-                "email": usuario.email,
-            }
-        })
-
-    except json.JSONDecodeError:
-        return JsonResponse(
-            {"ok": False, "erro": "JSON inválido."},
-            status=400
-        )
+    # Se tentarem acessar a URL direto pela barra do navegador (GET)
+    return JsonResponse({"ok": False, "erro": "Método não permitido. Use POST."}, 
+                        status=405)
 
 
 @csrf_exempt
