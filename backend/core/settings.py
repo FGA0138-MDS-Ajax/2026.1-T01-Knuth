@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders', ##solunado um bug
     'usuarios',
+    'consumo',
 ]
 
 MIDDLEWARE = [
