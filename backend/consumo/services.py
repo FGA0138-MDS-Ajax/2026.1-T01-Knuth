@@ -5,9 +5,13 @@ class CalculoEnergeticoError(ValueError):
 
 class MotorCalculoEnergetico:
     """
-    consumo_mensal_kwh = (potencia_watts / 1000) * horas_uso_dia * dias_uso_mes
-    custo_estimado = consumo_mensal_kwh * tarifa_kwh
+     Fórmulas:
+    total_consumo_kwh = soma dos consumos em kWh
+    consumo_medio_kwh = total_consumo_kwh / quantidade de eletrodomésticos
+    custo_total_estimado = total_consumo_kwh * tarifa_kwh
+    custo_medio_estimado = custo_total_estimado / quantidade de eletrodomésticos
     """
+
     @staticmethod
     def _decimal(valor, campo):
         try:
@@ -16,7 +20,7 @@ class MotorCalculoEnergetico:
             raise CalculoEnergeticoError(f"O campo '{campo}' deve ser numérico.")
 
     @staticmethod
-    def calcular_item(eletrodomestico, tarifa_kwh, dias_padrao=30):
+    def calcular_item(eletrodomestico, tarifa_kwh=None):
         nome = (
             eletrodomestico.get("nome")
             or eletrodomestico.get("nome_eletrodomestico")
@@ -24,105 +28,84 @@ class MotorCalculoEnergetico:
             or "Eletrodoméstico"
         )
 
-        potencia_watts = MotorCalculoEnergetico._decimal(
-            eletrodomestico.get("potencia_watts"),
-            "potencia_watts"
+        consumo_kwh = MotorCalculoEnergetico._decimal(
+            eletrodomestico.get("consumo_kwh"),
+            "consumo_kwh"
         )
 
-        horas_uso_dia = MotorCalculoEnergetico._decimal(
-            eletrodomestico.get("horas_uso_dia"),
-            "horas_uso_dia"
-        )
+        if consumo_kwh < 0:
+            raise CalculoEnergeticoError("O consumo em kWh não pode ser negativo.")
 
-        dias_uso_mes = MotorCalculoEnergetico._decimal(
-            eletrodomestico.get("dias_uso_mes", dias_padrao),
-            "dias_uso_mes"
-        )
-
-        tarifa_kwh = MotorCalculoEnergetico._decimal(
-            tarifa_kwh,
-            "tarifa_kwh"
-        )
-
-        if potencia_watts <= 0:
-            raise CalculoEnergeticoError("A potência em watts deve ser maior que zero.")
-
-        if horas_uso_dia <= 0 or horas_uso_dia > 24:
-            raise CalculoEnergeticoError(
-                "As horas de uso por dia devem ser maiores que zero e no máximo 24."
-            )
-
-        if dias_uso_mes <= 0 or dias_uso_mes > 31:
-            raise CalculoEnergeticoError(
-                "Os dias de uso no mês devem ser maiores que zero e no máximo 31."
-            )
-
-        if tarifa_kwh < 0:
-            raise CalculoEnergeticoError("A tarifa por kWh não pode ser negativa.")
-
-        consumo_diario_kwh = (potencia_watts / Decimal("1000")) * horas_uso_dia
-        consumo_mensal_kwh = consumo_diario_kwh * dias_uso_mes
-        custo_mensal_estimado = consumo_mensal_kwh * tarifa_kwh
-
-        return {
+        resultado = {
             "nome": nome,
-            "potencia_watts": potencia_watts.quantize(Decimal("0.01")),
-            "horas_uso_dia": horas_uso_dia.quantize(Decimal("0.01")),
-            "dias_uso_mes": int(dias_uso_mes),
-            "consumo_diario_kwh": consumo_diario_kwh.quantize(Decimal("0.0001")),
-            "consumo_mensal_kwh": consumo_mensal_kwh.quantize(Decimal("0.0001")),
-            "custo_mensal_estimado": custo_mensal_estimado.quantize(
-                Decimal("0.01"),
-                rounding=ROUND_HALF_UP
-            ),
+            "consumo_kwh": consumo_kwh.quantize(Decimal("0.0001")),
         }
 
+        if tarifa_kwh not in (None, "", 0, "0"):
+            tarifa_kwh = MotorCalculoEnergetico._decimal(tarifa_kwh, "tarifa_kwh")
+
+            if tarifa_kwh < 0:
+                raise CalculoEnergeticoError("A tarifa por kWh não pode ser negativa.")
+
+            custo_estimado = consumo_kwh * tarifa_kwh
+
+            resultado["tarifa_kwh"] = tarifa_kwh.quantize(Decimal("0.0001"))
+            resultado["custo_estimado"] = custo_estimado.quantize(
+                Decimal("0.01"),
+                rounding=ROUND_HALF_UP
+            )
+
+        return resultado
+
     @staticmethod
-    def calcular_consumo_medio(eletrodomesticos, tarifa_kwh, dias_padrao=30):
+    def calcular_consumo_medio(eletrodomesticos, tarifa_kwh=None):
         if not isinstance(eletrodomesticos, list) or len(eletrodomesticos) == 0:
             raise CalculoEnergeticoError(
-                "Informe uma lista de eletrodomésticos para calcular o consumo."
+                "Informe uma lista de eletrodomésticos para calcular o consumo médio."
             )
 
         itens_calculados = [
             MotorCalculoEnergetico.calcular_item(
                 eletrodomestico=item,
-                tarifa_kwh=tarifa_kwh,
-                dias_padrao=dias_padrao,
+                tarifa_kwh=tarifa_kwh
             )
             for item in eletrodomesticos
         ]
 
-        total_consumo_mensal_kwh = sum(
-            item["consumo_mensal_kwh"] for item in itens_calculados
-        )
-
-        total_custo_mensal = sum(
-            item["custo_mensal_estimado"] for item in itens_calculados
+        total_consumo_kwh = sum(
+            item["consumo_kwh"] for item in itens_calculados
         )
 
         quantidade = Decimal(len(itens_calculados))
-
-        consumo_medio_mensal_kwh = total_consumo_mensal_kwh / quantidade
-        custo_medio_mensal = total_custo_mensal / quantidade
+        consumo_medio_kwh = total_consumo_kwh / quantidade
 
         eletrodomestico_maior_consumo = max(
             itens_calculados,
-            key=lambda item: item["consumo_mensal_kwh"]
+            key=lambda item: item["consumo_kwh"]
         )
 
-        return {
+        resultado = {
             "quantidade_eletrodomesticos": len(itens_calculados),
-            "total_consumo_mensal_kwh": total_consumo_mensal_kwh.quantize(Decimal("0.0001")),
-            "consumo_medio_mensal_kwh": consumo_medio_mensal_kwh.quantize(Decimal("0.0001")),
-            "total_custo_mensal": total_custo_mensal.quantize(
-                Decimal("0.01"),
-                rounding=ROUND_HALF_UP
-            ),
-            "custo_medio_mensal": custo_medio_mensal.quantize(
-                Decimal("0.01"),
-                rounding=ROUND_HALF_UP
-            ),
+            "total_consumo_kwh": total_consumo_kwh.quantize(Decimal("0.0001")),
+            "consumo_medio_kwh": consumo_medio_kwh.quantize(Decimal("0.0001")),
             "eletrodomestico_maior_consumo": eletrodomestico_maior_consumo,
             "itens": itens_calculados,
         }
+
+        if tarifa_kwh not in (None, "", 0, "0"):
+            tarifa_kwh = MotorCalculoEnergetico._decimal(tarifa_kwh, "tarifa_kwh")
+
+            total_custo_estimado = total_consumo_kwh * tarifa_kwh
+            custo_medio_estimado = total_custo_estimado / quantidade
+
+            resultado["tarifa_kwh"] = tarifa_kwh.quantize(Decimal("0.0001"))
+            resultado["total_custo_estimado"] = total_custo_estimado.quantize(
+                Decimal("0.01"),
+                rounding=ROUND_HALF_UP
+            )
+            resultado["custo_medio_estimado"] = custo_medio_estimado.quantize(
+                Decimal("0.01"),
+                rounding=ROUND_HALF_UP
+            )
+
+        return resultado
