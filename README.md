@@ -1,4 +1,5 @@
-## template provisorio- Branch developer
+## template-repository - Branch Main
+Template de Repositório para a matéria de Métodos de Desenvolvimento de Software lecionado pelo professor Ricardo Ajax.
 
 ## Esta branch foi criada para inserir todas as outras branchs antes de ser inserida na main
 
