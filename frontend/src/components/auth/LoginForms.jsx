@@ -24,7 +24,7 @@ export default function LoginForms() {
     setCarregando(true)
 
     try {
-      // Usamos a URL limpa do colega, mas enviamos o SEU pacote com username
+      
       const resposta = await fetch(apiUrl('/api/login/'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,6 +43,7 @@ export default function LoginForms() {
         throw new Error(dados.erro || 'Nome de usuário ou senha inválidos.')
       }
 
+      localStorage.setItem('user_name', dados.usuario.username);
       // Redirecionamento configurado pelo colega
       navigate('/home', { replace: true, state: { usuario: dados.usuario } })
     } catch (error) {

@@ -2,6 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function Navbar() {
+  const nomeUsuario = localStorage.getItem('user_name') || 'Visitante';
+  const inicial = nomeUsuario.charAt(0).toUpperCase();
+
+
+
   return (
     <nav className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -28,7 +33,7 @@ function Navbar() {
                     <span className="sr-only">Open user menu</span>
                     {/* Você pode usar uma imagem do usuário aqui */}
                     <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center">
-                      <span className="text-white font-medium">G</span>
+                      <span className="text-white font-medium">{inicial}</span>
                     </div>
                   </button>
                 </div>
