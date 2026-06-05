@@ -4,8 +4,11 @@ Plataforma web responsiva voltada para **simulação de consumo energético resi
 
 O projeto integra dois pilares principais:
 
--   **Simulação e Controle**: cálculo de consumo e custo de aparelhos elétricos.
--   **Educação Ambiental**: conteúdos interativos sobre eficiência energética e fontes renováveis.
+##  Objetivos
+- Permitir que famílias brasileiras compreendam e controlem seu consumo de energia elétrica.
+- Apoiar educadores e estudantes com recursos pedagógicos práticos e interativos.
+- Incentivar hábitos sustentáveis por meio de feedback visual.
+- Garantir acessibilidade e responsividade em qualquer dispositivo.
 
 ---
 
