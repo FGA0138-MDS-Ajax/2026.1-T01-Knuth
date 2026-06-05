@@ -22,7 +22,7 @@ function DashboardTelaPrincipal() {
     
     /*
     setLoading(true);
-    fetch('http://localhost:8000/simulacoes/minhas/') 
+    fetch('http://localhost:8000/api/consumo/simulacoes/minhas/') 
       .then(response => response.json())
       .then(data => {
         setSimulacoes(data.simulacoes); 
