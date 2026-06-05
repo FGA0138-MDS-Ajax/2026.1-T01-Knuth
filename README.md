@@ -11,7 +11,7 @@ O projeto integra dois pilares principais:
 ##  Objetivos
 - Permitir que famílias brasileiras compreendam e controlem seu consumo de energia elétrica.
 - Apoiar educadores e estudantes com recursos pedagógicos práticos e interativos.
-- Incentivar hábitos sustentáveis por meio de gamificação e feedback visual.
+- Incentivar hábitos sustentáveis por meio de feedback visual.
 - Garantir acessibilidade e responsividade em qualquer dispositivo.
 
 ---
