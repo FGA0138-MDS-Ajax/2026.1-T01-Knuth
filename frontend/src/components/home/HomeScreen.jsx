@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '../common/Navbar';
+import DashboardTelaPrincipal from '../dashboards/DashboardTelaPrincipal';
 
 function HomeScreen() {
   return (
@@ -7,17 +8,9 @@ function HomeScreen() {
       <Navbar />
       <main>
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          {/* O conteúdo do seu dashboard virá aqui */}
           <div className="px-4 py-6 sm:px-0">
-            <div className="border-4 border-dashed border-gray-200 rounded-lg h-96">
-                <div className="flex items-center justify-center h-full">
-                    <h1 className="text-3xl font-bold text-gray-800">
-                        Dashboard Principal
-                    </h1>
-                </div>
-            </div>
+            <DashboardTelaPrincipal />
           </div>
-          {/* Fim do conteúdo do dashboard */}
         </div>
       </main>
     </div>
