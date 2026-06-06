@@ -1,0 +1,23 @@
+# ----------------------------------------
+# 🐍 Python Virtual Environment (Venv)
+# ----------------------------------------
+# Ignora a pasta 'venv' na raiz do projeto
+/venv/
+
+# ----------------------------------------
+# 📁 MkDocs e Artefatos Gerados
+# ----------------------------------------
+# Diretório de build do site MkDocs (gerado pelo 'mkdocs build')
+/site/
+
+# ----------------------------------------
+# 💻 IDEs e Logs
+# ----------------------------------------
+# Configurações locais do PyCharm (JetBrains)
+.idea/
+
+# Logs e arquivos de cache
+__pycache__/
+*.pyc
+npm-debug.log*
+.DS_Store

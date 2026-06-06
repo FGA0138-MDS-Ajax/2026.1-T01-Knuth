@@ -1,0 +1,9 @@
+site_name: Documentação
+
+nav:
+  - Index: "index.md"
+  - Exemplo: "exemplo.md"
+  - PastaExemplo:
+    - SubpastaExemplo1: "SubPastaExemplo/SubPastaExemplo.md"
+theme:
+  name: material
