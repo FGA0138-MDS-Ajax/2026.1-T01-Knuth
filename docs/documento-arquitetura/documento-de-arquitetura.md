@@ -1,6 +1,6 @@
 # EducaEnergia
 ## Documento de Arquitetura
-**Versão 1.0**
+**Versão 1.1**
 
 ---
 
@@ -8,7 +8,7 @@
 
 | Mat | Nome | Função (responsabilidade) | Pontos de participação na elaboração |
 | :--- | :--- | :--- | :--- |
-| 242023210 | Alicia Doralice de Medeiros Maia | Dona do Produto - PO | 12 |
+| 242023210 | Alicia Doralice de Medeiros Maia | Dona do Produto - PO | 10 |
 | 242023229 | Angeline Izaura de Lima Melo | Analista de Qualidade | 9.8 |
 | 242015138 | Bruno Ferreira Dornelas | Desenvolvedor | 8.8 |
 | 242015773 | Caio Breno De Souza Bezerra | Desenvolvedor | 8.8 |
@@ -17,7 +17,7 @@
 | 231034707 | Giovana Ferreira dos Santos | Desenvolvedora | 8.8 |
 | 232003714 | Jônatas Davi Oliveira Farias | Desenvolvedor | 8.8 |
 | 242023990 | Jorge Henrique Torres Gargalhone | Desenvolvedor | 8.8 |
-| 251023602 | Kalebe Davi Sarmento da Silva | Desenvolvedor | 7.8 |
+| 251023602 | Kalebe Davi Sarmento da Silva | Desenvolvedor | 8.8 |
 | 242032460 | Leonardo Lopes Cruz | Desenvolvedor | 8.8 |
 
 ---
@@ -27,6 +27,7 @@
 | Data | Versão | Descrição | Autor(es) |
 | :--- | :--- | :--- | :--- |
 | 08/05/2026 | 1.0 | Primeira versão do documento, seguindo alterações no documento de visão | Alicia |
+| 23/05/2026 | 1.1 | Modificações quanto as tecnologias utilizadas no frontend | Leonardo |
 
 ---
 
@@ -35,7 +36,7 @@
 ### 1.1 Propósito
 Este documento descreve a organização arquitetural do sistema EducaEnergia, desenvolvido na disciplina de MDS — Métodos de Desenvolvimento de Software — edição do primeiro semestre de 2026. O objetivo é fornecer uma visão abrangente e estruturada da solução para desenvolvedores, testadores e demais stakeholders, detalhando as escolhas tecnológicas e os padrões de projeto adotados para garantir a escalabilidade e a eficiência da plataforma.
 
-O foco deste documento está na integração dos três pilares fundamentais do produto — Simulação e Controle, Educação Ambiental — utilizando o padrão arquitetural MVC (Model-View-Controller) e tecnologias como Python e JavaScript.
+O foco deste documento está na integração dos três pilares fundamentais do produto — Simulação e Controle, Educação Ambiental — utilizando o padrão arquitetural MVC (Model-View-Controller) e tecnologias como Python, JavaScript e Python.
 
 ### 1.2 Escopo
 O escopo do produto compreende o desenvolvimento de uma plataforma web responsiva denominada EducaEnergia, acessível gratuitamente pela Internet mediante cadastro e autenticação do usuário, destinada a consumidores residenciais, estudantes e educadores brasileiros.
@@ -62,7 +63,7 @@ A arquitetura do sistema Educa Energia foi projetada para transformar os problem
 
 As tecnologias foram selecionadas para atender às necessidades específicas de cada pilar do escopo:
 * **Simulação e Controle (Python):** Escolhido pela alta produtividade e eficiência no processamento dos cálculos matemáticos necessários para as estimativas de kWh e custos baseados nas tarifas da ANEEL.
-* **Educação Ambiental (JS/Web Responsivo):** Conforme o Documento de Visão v. 1.0 (2026), a arquitetura garante a acessibilidade (item 1.3) para estudantes e famílias em qualquer dispositivo, permitindo uma interface fluida para conteúdos e quizzes.
+* **Educação Ambiental (JS/Web Responsivo):** Conforme o Documento de Visão v. 1.0 (2026), a arquitetura garante a acessibilidade (item 1.3) para estudantes e famílias em qualquer dispositivo para estudantes e famílias em qualquer dispositivo, permitindo uma interface fluida para conteúdos e quizzes.
 
 A infraestrutura foca na flexibilidade e na organização do trabalho da equipe:
 * **Banco MySQL:** A escolha baseia-se na viabilidade técnica, visto que a maioria dos integrantes da equipe possui experiência prévia com a linguagem SQL, o que reduz a curva de aprendizado e mitiga riscos de implementação.
@@ -87,7 +88,7 @@ Abaixo estão descritas as responsabilidades de cada camada, instanciadas com as
 **Camada de Visão (View)**
 * **Papel:** É a interface de interação direta com o usuário (famílias, estudantes e administradores).
 * **Componentes:** Telas de simulação de consumo, dashboards de progresso, módulos de conteúdo educativo e formulários de cadastro.
-* **Tecnologias:** HTML, CSS e JavaScript.
+* **Tecnologias:** HTML, CSS e JavaScript, React, Vite e TailwindCSS.
 * **Responsabilidades:** Capturar as entradas do usuário (como potência de aparelhos e tempo de uso) e exibir os resultados processados (estimativas em R$ e kWh, insígnias conquistadas).
 
 **Camada de Controle (Controller)**
@@ -156,7 +157,7 @@ Exemplo: um usuário cadastra sua geladeira e chuveiro, e o sistema mostra quant
 **Visão organizacional lógica:**
 O Sistema é organizado no formato MVC.
 * **Camada de apresentação (View):**
-  * Tecnologias: HTML, CSS, JavaScript.
+  * Tecnologias: HTML, CSS, JavaScript, React, Vite e TailwindCSS.
   * Responsável pela interface com o usuário, renderização das páginas e interação (forms, gráficos, dashboards).
 * **Camada de aplicação (Controller):**
   * Tecnologias: Python (framework web como Flask ou Django).
@@ -169,7 +170,7 @@ O Sistema é organizado no formato MVC.
 **Visão estrutural:**
 Componentes principais:
 * **Frontend:**
-  * Interface web (HTML/CSS/JS).
+  * Interface web (HTML/CSS/JS/React/Vite/TailwindCSS).
   * Comunicação com backend via HTTP/REST (fetch/AJAX).
 * **Backend (Python):**
   * Controllers: gerenciam rotas (login, cadastro, simulação, conteúdo educativo).
@@ -191,7 +192,7 @@ Exemplo de fluxo:
 Ambiente típico:
 * **Cliente:**
   * Navegador web (desktop ou mobile).
-  * Executa HTML, CSS e JavaScript.
+  * Executa HTML, CSS, JavaScript e renderiza o React.
 * **Servidor de aplicação:**
   * Backend em Python (Flask/Django).
   * Pode rodar em servidor Linux (ex: Ubuntu).
@@ -225,7 +226,7 @@ O sistema Educa Energia é subdividido em módulos lógicos que seguem o padrão
 
 **2.5.2.1 Módulos do Sistema**
 Os principais pacotes que compõem a lógica do sistema são:
-* **Pacote de Visão (View):** Compreende a interface front-end desenvolvida em HTML, CSS e JavaScript. É responsável por exibir as telas de simulação de consumo e os módulos educativos. Garante que a experiência do usuário seja responsiva e intuitiva, permitindo o uso em desktops e celulares.
+* **Pacote de Visão (View):** Compreende a interface front-end desenvolvida em HTML, CSS, JavaScript, React, Vite e TailwindCSS. É responsável por exibir as telas de simulação de consumo e os módulos educativos. Garante que a experiência do usuário seja responsiva e intuitiva, permitindo o uso em desktops e celulares.
 * **Pacote de Controle (Controller):** Implementado em Python, este módulo atua como o cérebro da aplicação. Ele recebe as entradas do usuário vindas da View (como a potência dos aparelhos e tempo de uso) e aciona as funções de cálculo ou busca de dados. Centraliza as regras de negócio do sistema. Ao separar essa lógica da interface, conseguimos testar as funções de cálculo em Python sem precisar carregar o navegador.
 * **Pacote de Modelo (Model/Persistência):** Responsável pela interface com o banco de dados SQL. Ele define como os dados de usuários, aparelhos cadastrados e conquistas (emblemas) são estruturados e manipulados. Utiliza a flexibilidade do SQL para armazenar perfis de usuários e logs de consumo de forma eficiente.
 * **Pacote de Serviços (Services):** (Opcional, mas recomendado para o back-end) Contém a lógica específica de cálculos energéticos (conversão de Watts/Tempo em kWh e R$) e Isola os cálculos matemáticos complexos de energia limpa, garantindo que o simulador seja preciso e fácil de atualizar caso as tarifas da ANEEL mudem.
