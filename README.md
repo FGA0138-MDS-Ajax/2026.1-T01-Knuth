@@ -1,5 +1,7 @@
 # EducaEnergia
 
+O projeto está alocado na branch developer
+
 Plataforma web responsiva voltada para **simulação de consumo energético residencial** e **educação ambiental**, desenvolvida na disciplina **Métodos de Desenvolvimento de Software (MDS)** – Turma 1, 2026.1.
 
 O projeto integra dois pilares principais:
