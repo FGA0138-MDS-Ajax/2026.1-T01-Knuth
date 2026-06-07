@@ -1,7 +1,6 @@
 from decimal import Decimal
 from django.test import SimpleTestCase
 from .services import MotorCalculoEnergetico, CalculoEnergeticoError
-
 class MotorCalculoEnergeticoTest(SimpleTestCase):
     def test_calcula_media_de_3_meses_corretamente(self):
         resultado = MotorCalculoEnergetico.calcular_media_mensal([100, 150, 200])
