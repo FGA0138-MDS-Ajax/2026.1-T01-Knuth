@@ -26,7 +26,7 @@ def carregar_json(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def calcular_consumo_medio(request):
+def calcular_media_mensal_view(request):
     try:
         dados = carregar_json(request)
         ##chama o calculo correto
@@ -54,7 +54,7 @@ def calcular_consumo_medio(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def criar_simulacao_consumo(request):
+def criar_simulacao_view(request):
     try:
         dados = carregar_json(request)
 
