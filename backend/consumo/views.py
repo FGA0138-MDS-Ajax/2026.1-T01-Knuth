@@ -106,7 +106,8 @@ def listar_minhas_simulacoes(request):
             status=200,
         )
 
-    simulacoes = SimulacaoConsumo.objects.filter(usuario=request.user).prefetch_related("itens")
+    simulacoes = SimulacaoConsumo.objects.filter(usuario=request.user)
+    #simulacoes = SimulacaoConsumo.objects.filter(usuario=request.user).prefetch_related("itens")
     dados = []
 
     for simulacao in simulacoes:
