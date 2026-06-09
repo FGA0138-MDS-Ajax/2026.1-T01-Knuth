@@ -1,45 +1,54 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { encerrarSessao, getNomeUsuario } from '../../config/auth';
+import EducaEnergiaLogo from '../auth/EducaEnergiaLogo';
 
 function Navbar() {
-  const nomeUsuario = localStorage.getItem('user_name') || 'Visitante';
+  const navigate = useNavigate();
+  const nomeUsuario = getNomeUsuario() || 'Visitante';
   const inicial = nomeUsuario.charAt(0).toUpperCase();
 
-
+  const sair = () => {
+    encerrarSessao();
+    navigate('/login', { replace: true });
+  };
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="sticky top-0 z-20 border-b border-emerald-100 bg-white/80 backdrop-blur-xl shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              {/* Você pode adicionar sua logo aqui */}
-              <span className="font-bold text-xl text-green-600">EducaEnergia</span>
-            </div>
+          <div className="flex items-center gap-8">
+            <Link to="/home" className="flex items-center gap-2">
+              <EducaEnergiaLogo className="h-9 w-auto" />
+              <span className="font-bold text-xl bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">
+                EducaEnergia
+              </span>
+            </Link>
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
-                <Link to="/" className="text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium">Dashboard</Link>
-                <Link to="/simulador" className="text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium">Simulador</Link>
-                <Link to="/aprender" className="text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium">Aprenda</Link>
+              <div className="flex items-baseline space-x-1">
+                <Link to="/home" className="text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 px-3 py-2 rounded-lg text-sm font-medium transition">
+                  Dashboard
+                </Link>
+                <Link to="/consumo-medio" className="text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 px-3 py-2 rounded-lg text-sm font-medium transition">
+                  Nova Simulação
+                </Link>
               </div>
             </div>
           </div>
-          <div className="hidden md:block">
-            <div className="ml-4 flex items-center md:ml-6">
-              {/* Ícone do Perfil */}
-              <div className="ml-3 relative">
-                <div>
-                  <button className="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
-                    <span className="sr-only">Open user menu</span>
-                    {/* Você pode usar uma imagem do usuário aqui */}
-                    <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center">
-                      <span className="text-white font-medium">{inicial}</span>
-                    </div>
-                  </button>
-                </div>
-                {/* Menu Dropdown (a ser implementado) */}
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2">
+              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-sm">
+                <span className="text-white font-semibold">{inicial}</span>
               </div>
+              <span className="text-sm font-medium text-slate-700 max-w-[160px] truncate">{nomeUsuario}</span>
             </div>
+            <button
+              onClick={sair}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+            >
+              Sair
+            </button>
           </div>
         </div>
       </div>

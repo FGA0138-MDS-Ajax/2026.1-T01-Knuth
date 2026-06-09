@@ -1,18 +1,17 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { apiUrl } from '../../config/api'
+import { salvarSessao } from '../../config/auth'
 
 export default function LoginForms() {
-  // Mantemos as rotas do colega
   const navigate = useNavigate()
   const location = useLocation()
   const cadastroSucesso = location.state?.cadastroSucesso
-  
-  // Pegamos a SUA lógica de usar username em vez de e-mail
-  const usernameCadastrado = location.state?.username 
-  const [username, setUsername] = useState(usernameCadastrado ?? '')
-  
-  // Mantemos as melhorias de UI do colega
+
+  // O cadastro envia o e-mail (que também é o username). Preenchemos o campo.
+  const usuarioCadastrado = location.state?.username ?? location.state?.email
+  const [username, setUsername] = useState(usuarioCadastrado ?? '')
+
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [erro, setErro] = useState('')
@@ -24,12 +23,11 @@ export default function LoginForms() {
     setCarregando(true)
 
     try {
-      
       const resposta = await fetch(apiUrl('/api/login/'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ username, password }), 
+        body: JSON.stringify({ username, password }),
       })
 
       let dados = {}
@@ -43,8 +41,7 @@ export default function LoginForms() {
         throw new Error(dados.erro || 'Nome de usuário ou senha inválidos.')
       }
 
-      localStorage.setItem('user_name', dados.usuario.username);
-      // Redirecionamento configurado pelo colega
+      salvarSessao(dados.usuario.username)
       navigate('/home', { replace: true, state: { usuario: dados.usuario } })
     } catch (error) {
       setErro(
@@ -62,15 +59,14 @@ export default function LoginForms() {
       {cadastroSucesso && (
         <div
           role="status"
-          className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100"
+          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
         >
           Conta criada com sucesso! Faça login para continuar.
         </div>
       )}
 
-      {/* Trocamos o campo E-mail do colega pelo seu campo de Username */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-emerald-50/90" htmlFor="username">
+        <label className="block text-sm font-medium text-slate-700" htmlFor="username">
           E-mail do Usuário
         </label>
         <input
@@ -80,13 +76,13 @@ export default function LoginForms() {
           value={username}
           onChange={(event) => setUsername(event.target.value)}
           placeholder="Digite seu usuário"
-          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/60 focus:bg-white/[0.07] focus:ring-2 focus:ring-emerald-400/20"
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-emerald-50/90" htmlFor="password">
+        <label className="block text-sm font-medium text-slate-700" htmlFor="password">
           Senha
         </label>
         <div className="relative">
@@ -97,13 +93,13 @@ export default function LoginForms() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             placeholder="Digite sua senha"
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-12 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/60 focus:bg-white/[0.07] focus:ring-2 focus:ring-emerald-400/20"
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pr-12 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30"
             required
           />
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute inset-y-0 right-0 px-3 text-xs font-medium text-slate-400 transition hover:text-emerald-300"
+            className="absolute inset-y-0 right-0 px-3 text-xs font-medium text-slate-400 transition hover:text-emerald-600"
             aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
           >
             {showPassword ? 'Ocultar' : 'Ver'}
@@ -114,7 +110,7 @@ export default function LoginForms() {
       {erro && (
         <div
           role="alert"
-          className="rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200"
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
         >
           {erro}
         </div>
@@ -123,7 +119,7 @@ export default function LoginForms() {
       <button
         type="submit"
         disabled={carregando}
-        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-3.5 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <span className="relative z-10">
           {carregando ? 'Entrando...' : 'Entrar na plataforma'}
@@ -131,9 +127,9 @@ export default function LoginForms() {
         <span className="absolute inset-0 -translate-x-full bg-white/20 transition group-hover:translate-x-full duration-500" />
       </button>
 
-      <p className="text-center text-sm text-slate-400">
+      <p className="text-center text-sm text-slate-500">
         Ainda não tem conta?{' '}
-        <Link to="/register" className="font-medium text-emerald-300 transition hover:text-emerald-200">
+        <Link to="/register" className="font-medium text-emerald-600 transition hover:text-emerald-500">
           Criar conta gratuita
         </Link>
       </p>
