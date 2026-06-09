@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../../config/api';
 
 export default function PaginaConsumoMedio() {
   const navigate = useNavigate();
@@ -7,6 +8,7 @@ export default function PaginaConsumoMedio() {
   const [numMeses, setNumMeses] = useState(3);
   const [consumos, setConsumos] = useState(Array(3).fill(''));
   const [resultado, setResultado] = useState(null);
+  const [erro, setErro] = useState('');
 
   const handleInputChange = (index, value) => {
     const novosConsumos = [...consumos];
@@ -15,17 +17,27 @@ export default function PaginaConsumoMedio() {
   };
 
   const calcular = async () => {
-    const response = await fetch('http://localhost:8000/api/consumo/calcular/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ consumos: consumos.map(Number) })
-    });
-    const data = await response.json();
-    if (data.ok) setResultado(data.resultado);
+    setErro('');
+    setResultado(null);
+    try {
+      const response = await fetch(apiUrl('/api/consumo/calcular/'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ consumos: consumos.map(Number) })
+      });
+      const data = await response.json();
+      if (data.ok) {
+        setResultado(data.resultado);
+      } else {
+        setErro(data.erro || 'Não foi possível calcular a média.');
+      }
+    } catch (e) {
+      setErro('Falha de conexão com o servidor.');
+    }
   };
 
   const salvar = async () => {
-    const response = await fetch('http://localhost:8000/api/consumo/simulacoes/', {
+    const response = await fetch(apiUrl('/api/consumo/simulacoes/'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ titulo, consumos: consumos.map(Number) })
@@ -56,6 +68,10 @@ export default function PaginaConsumoMedio() {
         ))}
 
         <button onClick={calcular} className="bg-blue-600 text-white px-4 py-2 rounded">Calcular Média</button>
+
+        {erro && (
+          <p className="text-red-600 text-sm font-medium">{erro}</p>
+        )}
       </div>
 
       {resultado && (
