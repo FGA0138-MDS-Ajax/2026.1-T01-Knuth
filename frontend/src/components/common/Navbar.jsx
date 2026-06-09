@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { apiUrl } from '../../config/api';
 import { encerrarSessao, getNomeUsuario } from '../../config/auth';
 import EducaEnergiaLogo from '../auth/EducaEnergiaLogo';
 
@@ -8,7 +9,15 @@ function Navbar() {
   const nomeUsuario = getNomeUsuario() || 'Visitante';
   const inicial = nomeUsuario.charAt(0).toUpperCase();
 
-  const sair = () => {
+  const sair = async () => {
+    try {
+      await fetch(apiUrl('/api/logout/'), {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch {
+      // Encerra a sessão local mesmo se a API estiver indisponível.
+    }
     encerrarSessao();
     navigate('/login', { replace: true });
   };

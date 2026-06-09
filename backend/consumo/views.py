@@ -1,10 +1,16 @@
 import json
+import logging
 from decimal import Decimal
+
+from django.db import DatabaseError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+
 from .models import SimulacaoConsumo
 from .services import MotorCalculoEnergetico, CalculoEnergeticoError
+
+logger = logging.getLogger(__name__)
 
 def serializar_decimal(valor): #função fica
     if isinstance(valor, Decimal):
@@ -55,25 +61,32 @@ def calcular_media_mensal_view(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def criar_simulacao_view(request):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {
+                "ok": False,
+                "erro": "Faça login para salvar simulações.",
+            },
+            status=401,
+        )
+
     try:
         dados = carregar_json(request)
 
         titulo = dados.get("titulo") or "Simulação de consumo"
         consumos = dados.get("consumos")
-        ##nada de dias e de eletrodomesticos
 
         resultado = MotorCalculoEnergetico.calcular_media_mensal(
-            consumos_mensais_kwh= consumos
+            consumos_mensais_kwh=consumos
         )
 
         simulacao = SimulacaoConsumo.objects.create(
-            usuario=request.user if request.user.is_authenticated else None,
+            usuario=request.user,
             titulo=titulo,
-            meses_analisados = resultado["meses_analisados"],
+            meses_analisados=resultado["meses_analisados"],
             total_consumo_mensal_kwh=resultado["consumo_total_kwh"],
             consumo_medio_mensal_kwh=resultado["consumo_medio_mensal_kwh"],
         )
-
 
         return JsonResponse(
             {
@@ -92,6 +105,15 @@ def criar_simulacao_view(request):
                 "erro": str(erro),
             },
             status=400,
+        )
+    except DatabaseError:
+        logger.exception("Falha ao persistir simulação de consumo")
+        return JsonResponse(
+            {
+                "ok": False,
+                "erro": "Erro interno ao salvar a simulação. Verifique se as migrations foram aplicadas.",
+            },
+            status=500,
         )
 
 
