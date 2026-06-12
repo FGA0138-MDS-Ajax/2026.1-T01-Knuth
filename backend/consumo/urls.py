@@ -5,4 +5,5 @@ urlpatterns = [
     path("calcular/", views.calcular_media_mensal_view, name="calcular-media"),
     path("simulacoes/", views.criar_simulacao_view, name="criar-simulacao"),
     path("simulacoes/minhas/", views.listar_minhas_simulacoes, name="listar-minhas-simulacoes"),
+    path("eletrodomesticos/", views.listar_eletrodomesticos, name="listar-eletrodomesticos"),
 ]

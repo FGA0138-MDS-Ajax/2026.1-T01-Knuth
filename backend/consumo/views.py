@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from .models import SimulacaoConsumo
+from .models import SimulacaoConsumo, Eletrodomestico
 from .services import MotorCalculoEnergetico, CalculoEnergeticoError
 
 logger = logging.getLogger(__name__)
@@ -151,3 +151,42 @@ def listar_minhas_simulacoes(request):
         },
         status=200,
     )
+
+
+##RF03 apenas uma lista dos eletrodomesticos
+#inserção de media de watts para agilizar calculo da RF04
+
+@require_http_methods(["GET"])
+def listar_eletrodomesticos(request):
+    pesquisa = request.GET.get("buscar:", "").strip()
+
+    if pesquisa:
+        eletrodomesticos = Eletrodomestico.objects.filter(nome__icontains=pesquisa)
+        if not eletrodomesticos.exists():
+            return JsonResponse(
+                {
+                    "ok": True,
+                    "mensagem": "Não temos informações energéticas sobre este eletrodoméstico.",
+                    "eletrodomesticos": []
+                },
+                status=200,
+            )
+    else:
+        eletrodomesticos = Eletrodomestico.objects.filter(destaque=True)[:10]
+
+    dados = []
+    for eletro in eletrodomesticos:
+        dados.append({
+            "id": eletro.id,
+            "nome": eletro.nome,
+            "potencia_media_watts": eletro.potencia_media_watts,
+            "destaque": eletro.destaque
+        })
+
+    return JsonResponse(
+        {
+            "ok": True,
+            "eletrodomesticos": dados,
+        },
+        status=200,)
+    
