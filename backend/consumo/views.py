@@ -158,10 +158,11 @@ def listar_minhas_simulacoes(request):
 
 @require_http_methods(["GET"])
 def listar_eletrodomesticos(request):
-    pesquisa = request.GET.get("buscar:", "").strip()
+    pesquisa = request.GET.get("busca", "").strip()
 
     if pesquisa:
         eletrodomesticos = Eletrodomestico.objects.filter(nome__icontains=pesquisa)
+
         if not eletrodomesticos.exists():
             return JsonResponse(
                 {
@@ -173,6 +174,7 @@ def listar_eletrodomesticos(request):
             )
     else:
         eletrodomesticos = Eletrodomestico.objects.filter(destaque=True)[:10]
+        print("testa para saber se estra entrando aqui")
 
     dados = []
     for eletro in eletrodomesticos:
