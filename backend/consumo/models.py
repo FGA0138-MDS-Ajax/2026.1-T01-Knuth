@@ -12,8 +12,8 @@ class SimulacaoConsumo(models.Model):
 
     titulo = models.CharField(max_length=120, default="Simulação de consumo")
     meses_analisados = models.PositiveBigIntegerField(default=3)
-    total_consumo_mensal_kwh = models.DecimalField(max_digits=12, decimal_places=4)
-    consumo_medio_mensal_kwh = models.DecimalField(max_digits=12, decimal_places=4)
+    total_consumo_mensal_kwh = models.DecimalField(max_digits=12, decimal_places=2)
+    consumo_medio_mensal_kwh = models.DecimalField(max_digits=12, decimal_places=2)
     criado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:
