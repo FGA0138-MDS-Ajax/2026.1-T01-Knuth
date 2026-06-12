@@ -41,6 +41,9 @@ function Navbar() {
                 <Link to="/consumo-medio" className="text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 px-3 py-2 rounded-lg text-sm font-medium transition">
                   Nova Simulação
                 </Link>
+                <Link to="/eletrodomesticos" className="text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 px-3 py-2 rounded-lg text-sm font-medium transition">
+                  Eletrodomésticos
+                </Link>
               </div>
             </div>
           </div>

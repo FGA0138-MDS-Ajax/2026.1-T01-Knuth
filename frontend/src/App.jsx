@@ -3,6 +3,7 @@ import AuthScreen from './components/auth/AuthScreen'
 import RegisterScreen from './components/auth/RegisterScreen'
 import HomeScreen from './components/home/HomeScreen'
 import PaginaConsumoMedio from './components/dashboards/PaginaConsumoMedio'
+import PaginaEletrodomesticos from './components/dashboards/PaginaEletrodomesticos'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { estaLogado } from './config/auth'
@@ -29,6 +30,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <PaginaConsumoMedio />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/eletrodomesticos"
+        element={
+          <ProtectedRoute>
+            <PaginaEletrodomesticos />
           </ProtectedRoute>
         }
       />
