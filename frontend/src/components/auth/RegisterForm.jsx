@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { apiUrl } from '../../config/api'
 
 const inputClassName =
-  'w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/60 focus:bg-white/[0.07] focus:ring-2 focus:ring-emerald-400/20'
+  'w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30'
 
 export default function RegisterForm() {
   const navigate = useNavigate()
@@ -66,7 +66,7 @@ export default function RegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="w-full space-y-4">
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-emerald-50/90" htmlFor="name">
+        <label className="block text-sm font-medium text-slate-700" htmlFor="name">
           Nome completo
         </label>
         <input
@@ -83,7 +83,7 @@ export default function RegisterForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-emerald-50/90" htmlFor="email">
+        <label className="block text-sm font-medium text-slate-700" htmlFor="email">
           E-mail
         </label>
         <input
@@ -100,7 +100,7 @@ export default function RegisterForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-emerald-50/90" htmlFor="password">
+        <label className="block text-sm font-medium text-slate-700" htmlFor="password">
           Senha
         </label>
         <input
@@ -118,7 +118,7 @@ export default function RegisterForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-emerald-50/90" htmlFor="confirmPassword">
+        <label className="block text-sm font-medium text-slate-700" htmlFor="confirmPassword">
           Confirmar senha
         </label>
         <input
@@ -138,7 +138,7 @@ export default function RegisterForm() {
       {erro && (
         <div
           role="alert"
-          className="rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200"
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
         >
           {erro}
         </div>
@@ -147,7 +147,7 @@ export default function RegisterForm() {
       <button
         type="submit"
         disabled={carregando}
-        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-3.5 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <span className="relative z-10">
           {carregando ? 'Criando conta...' : 'Criar conta gratuita'}
@@ -155,9 +155,9 @@ export default function RegisterForm() {
         <span className="absolute inset-0 -translate-x-full bg-white/20 transition group-hover:translate-x-full duration-500" />
       </button>
 
-      <p className="text-center text-sm text-slate-400">
+      <p className="text-center text-sm text-slate-500">
         Já tem conta?{' '}
-        <Link to="/login" className="font-medium text-emerald-300 transition hover:text-emerald-200">
+        <Link to="/login" className="font-medium text-emerald-600 transition hover:text-emerald-500">
           Fazer login
         </Link>
       </p>

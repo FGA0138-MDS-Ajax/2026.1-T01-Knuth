@@ -1,38 +1,107 @@
-## template-repository - Branch Main
-Template de Repositório para a matéria de Métodos de Desenvolvimento de Software lecionado pelo professor Ricardo Ajax.
+# EducaEnergia
 
-## Esta branch foi criada para inserir todas as outras branchs antes de ser inserida na main
+O projeto está alocado na branch developer.
 
-## ⚡ EducaEnergia
-Garantir o acesso à energia barata, confiável, sustentável e renovável para todos. — ODS 7 da ONU
+Plataforma web responsiva voltada para **simulação de consumo energético residencial** e **educação ambiental**, desenvolvida na disciplina **Métodos de Desenvolvimento de Software (MDS)** – Turma 01, 2026.1.
 
-O EducaEnergia é uma aplicação web desenvolvida como projeto para a disciplina de Métodos de Desenvolvimento de Software (MDS). Nosso foco é promover a conscientização sobre o consumo de energia elétrica, alinhado ao Objetivo de Desenvolvimento Sustentável (ODS) 7, com um olhar especial para a população de Brasília - Distrito Federal.
+O projeto integra dois pilares principais:
 
-## 🎯 Objetivo do Projeto
-O objetivo principal do EducaEnergia é auxiliar os brasilienses a entenderem melhor seu consumo de energia e, consequentemente, reduzirem o valor de suas contas de luz (Neoenergia Brasília). O sistema atua em três frentes principais:
+##  Objetivos
+- Permitir que famílias brasileiras compreendam e controlem seu consumo de energia elétrica mensalmente.
+- Apoiar educadores e estudantes com recursos pedagógicos práticos e interativos.
+- Incentivar hábitos sustentáveis por meio de tecnologias com feedback visual.
+- Garantir acessibilidade e responsividade em qualquer dispositivo.
 
-Estimativa: Ferramenta para calcular o gasto médio de energia das residências do DF.
+---
 
-Conscientização: Informações acessíveis sobre como a energia é medida e cobrada no DF, incluindo as bandeiras tarifárias.
+## Objetivos
 
-Recomendação: Dicas práticas e personalizadas para economizar energia, focando tanto na sustentabilidade ambiental quanto no alívio financeiro para as famílias.
+-   Permitir que famílias brasileiras compreendam e controlem seu consumo de energia elétrica.
+-   Apoiar educadores e estudantes com recursos pedagógicos práticos e interativos.
+-   Incentivar hábitos sustentáveis por meio de gamificação e feedback visual.
+-   Garantir acessibilidade e responsividade em qualquer dispositivo.
 
-## ✨ Funcionalidades Principais
-Calculadora de Consumo: O usuário pode inserir seus ultimos meses médio de consumo em kWh, informado em sua conta de luz, assim como verá a estimativa mpedioa do consumo dos eletrodomesticos (geladeira, chuveiro, ar-condicionado, etc.). o tempo de uso base dos eletrodomesticos e o sistema que estima o valor na conta de luz e com base nas tarifas atuais do DF.
+---
 
-Guia de Economia: Recomendações de redução de tempo medios de uso dos seus eletrodomesticos.
+## Tecnologias Utilizadas
 
-## 🛠️ Tecnologias Utilizadas
+-   **Frontend**: HTML, CSS, JavaScript
+-   **Backend**: Python (Flask/Django)
+-   **Banco de Dados**: PostgreSQL / MySQL (dependendo da fase do projeto)
+-   **Infraestrutura**: Hospedagem em nuvem (AWS, Azure, Vercel)
+-   **Arquitetura**: MVC (Model-View-Controller) + camada de Services
+-   **DevOps**: Docker (para conteinerização e deploy)
 
+---
 
-Front-end: React.js / HTML5 / CSS3 / JavaScript
+## Arquitetura
 
-Back-end: Node.js (Express) / Python (Django/FastAPI)
+O sistema segue o padrão **MVC**:
+- **Model**: gerenciamento de dados (usuários, aparelhos, consumo, conteúdos, quizzes).  
+- **View**: interface responsiva para usuários desktop e mobile.  
+- **Controller**: lógica de autenticação, rotas e coordenação entre camadas.  
+- **Services**: motor de cálculo energético e regras de negócio.
 
-Banco de Dados: PostgreSQL / SQL
+Fluxo básico:
 
-Prototipação & Design: Figma / Canva
+1.  Usuário cadastra aparelho →
+2.  Controller recebe requisição →
+3.  Model salva no banco →
+4.  Service calcula consumo/custo →
+5.  Resultado exibido na View.
 
-Gerenciamento de Projeto: GitHub / Discord / WhatsApp
+---
 
-## 🚀 Como Executar o Projeto Localmente
+## Equipe
+
+-   **Alicia Doralice de Medeiros Maia** – Product Owner (PO)
+-   **Angeline Izaura de Lima Melo** – Analista de Qualidade
+-   **Beatriz Brandão Fidelis Batista** – Desenvolvedora Backend
+-   **Bruno Ferreira Dornelas** – Desenvolvedor Backend
+-   **Caio Breno De Souza Bezerra** – Desenvolvedor Frontend
+-   **Danielly Reis dos Santos** – Desenvolvedora Backend
+-   **Gabriel Martins de Jesus da Silva** – Desenvolvedor Backend
+-   **Giovana Ferreira dos Santos** – Desenvolvedora Frontend
+-   **Jônatas Davi Oliveira Farias** – Desenvolvedor Backend
+-   **Jorge Henrique Torres Gargalhone** – Desenvolvedor Backend
+-   **Kalebe Davi Sarmento da Silva** – Desenvolvedor Backend
+-   **Leonardo Lopes Cruz** – Desenvolvedor Frontend
+
+---
+
+## Backlog (Resumo)
+
+-   Cadastro de usuários e autenticação.
+-   Cadastro de aparelhos e simulação de consumo.
+-   Módulo educativo com conteúdos e quizzes.
+-   Sistema de pontuação e emblemas.
+-   Relatórios de consumo e sugestões de economia.
+
+---
+
+## Testes
+
+-   Testes funcionais (cálculo de consumo, cadastro, login).
+-   Testes de usabilidade (interface responsiva e intuitiva).
+-   Testes de compatibilidade (navegadores e dispositivos móveis).
+
+---
+
+## Instalação e Execução
+
+### Pré-requisitos
+
+-   [Python 3.10+](https://www.python.org/downloads/)
+-   [Node.js](https://nodejs.org/)
+-   [PostgreSQL](https://www.postgresql.org/download/) ou MySQL
+-   [Docker](https://www.docker.com/) (opcional)
+-   Git
+
+---
+
+### Clonando o projeto
+
+```bash
+git clone https://github.com/FGA0138-MDS-Ajax/2026.1-T01-Knuth.git
+cd 2026.1-T01-Knuth
+```

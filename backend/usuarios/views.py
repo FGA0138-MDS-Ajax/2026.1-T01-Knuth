@@ -1,6 +1,6 @@
 import json
 
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -99,3 +99,13 @@ def cadastrar_usuario(request):
             {"ok": False, "erro": "JSON inválido."},
             status=400
         )
+
+
+@csrf_exempt
+@require_POST
+def fazer_logout(request):
+    logout(request)
+    return JsonResponse(
+        {"ok": True, "mensagem": "Logout realizado com sucesso."},
+        status=200,
+    )

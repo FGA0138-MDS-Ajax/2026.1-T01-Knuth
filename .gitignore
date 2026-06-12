@@ -9,4 +9,5 @@ coverage/
 # OS files
 .DS_Store
 
-.idea
+.idea/
+

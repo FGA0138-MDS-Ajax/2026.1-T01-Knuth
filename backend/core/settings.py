@@ -29,7 +29,11 @@ SECRET_KEY = 'django-insecure-on-*%ud!aro&zbl!3o0^$#8^o4do-2so2knc&xs_p_vv1geu4v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,web').split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -141,8 +145,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Liberar o acesso para o React
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-]
