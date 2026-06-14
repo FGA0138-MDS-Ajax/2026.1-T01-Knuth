@@ -1,5 +1,6 @@
 import json
 import logging
+import unicodedata  #para resolver os problemas de acentos e caracteres especiais na busca de eletrodomésticos
 from decimal import Decimal
 
 from django.db import DatabaseError
@@ -153,6 +154,19 @@ def listar_minhas_simulacoes(request):
     )
 
 
+def normalizar_texto(texto): #função para normalizar o texto de busca, removendo acentos e caracteres especiais, e convertendo para minúsculas
+    texto = texto or ""
+    texto = texto.strip().lower()
+
+    texto_normalizado = unicodedata.normalize("NFD", texto)
+
+    texto_sem_acento = "".join(
+        caractere for caractere in texto_normalizado
+        if unicodedata.category(caractere) != "Mn"
+    )
+
+    return texto_sem_acento
+
 ##RF03 apenas uma lista dos eletrodomesticos
 #inserção de media de watts para agilizar calculo da RF04
 
@@ -161,9 +175,16 @@ def listar_eletrodomesticos(request):
     pesquisa = request.GET.get("busca", "").strip()
 
     if pesquisa:
-        eletrodomesticos = Eletrodomestico.objects.filter(nome__icontains=pesquisa)
+        pesquisa_normalizada = normalizar_texto(pesquisa)
 
-        if not eletrodomesticos.exists():
+        todos_eletrodomesticos = Eletrodomestico.objects.all()
+
+        eletrodomesticos = [
+            eletro for eletro in todos_eletrodomesticos
+            if pesquisa_normalizada in normalizar_texto(eletro.nome)
+        ]
+
+        if not eletrodomesticos:
             return JsonResponse(
                 {
                     "ok": True,
@@ -174,9 +195,9 @@ def listar_eletrodomesticos(request):
             )
     else:
         eletrodomesticos = Eletrodomestico.objects.filter(destaque=True)[:10]
-        print("testa para saber se estra entrando aqui")
 
     dados = []
+
     for eletro in eletrodomesticos:
         dados.append({
             "id": eletro.id,
@@ -190,5 +211,5 @@ def listar_eletrodomesticos(request):
             "ok": True,
             "eletrodomesticos": dados,
         },
-        status=200,)
-    
+        status=200,
+    )
