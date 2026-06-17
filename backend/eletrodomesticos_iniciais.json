@@ -1,0 +1,227 @@
+[
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 1,
+    "fields": {
+        "nome": "Geladeira",
+        "potencia_media_watts": 250,
+        "destaque": true
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 2,
+    "fields": {
+        "nome": "Refrigerador",
+        "potencia_media_watts": 300,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 3,
+    "fields": {
+        "nome": "Fogão",
+        "potencia_media_watts": 50,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 4,
+    "fields": {
+        "nome": "Micro-ondas",
+        "potencia_media_watts": 1200,
+        "destaque": true
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 5,
+    "fields": {
+        "nome": "Máquina de lavar roupa",
+        "potencia_media_watts": 500,
+        "destaque": true
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 6,
+    "fields": {
+        "nome": "Máquina de lavar louça",
+        "potencia_media_watts": 1500,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 7,
+    "fields": {
+        "nome": "Air fryer",
+        "potencia_media_watts": 1500,
+        "destaque": true
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 8,
+    "fields": {
+        "nome": "Liquidificador",
+        "potencia_media_watts": 300,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 9,
+    "fields": {
+        "nome": "Sanduicheira",
+        "potencia_media_watts": 750,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 10,
+    "fields": {
+        "nome": "Filtro",
+        "potencia_media_watts": 100,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 11,
+    "fields": {
+        "nome": "Ferro de passar",
+        "potencia_media_watts": 1000,
+        "destaque": true
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 12,
+    "fields": {
+        "nome": "Aspirador de pó",
+        "potencia_media_watts": 1000,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 13,
+    "fields": {
+        "nome": "Ventilador",
+        "potencia_media_watts": 100,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 14,
+    "fields": {
+        "nome": "Ar condicionado",
+        "potencia_media_watts": 1500,
+        "destaque": true
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 15,
+    "fields": {
+        "nome": "Chuveiro",
+        "potencia_media_watts": 5500,
+        "destaque": true
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 16,
+    "fields": {
+        "nome": "Secador de cabelo",
+        "potencia_media_watts": 1500,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 17,
+    "fields": {
+        "nome": "Televisão",
+        "potencia_media_watts": 150,
+        "destaque": true
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 18,
+    "fields": {
+        "nome": "Computador",
+        "potencia_media_watts": 300,
+        "destaque": true
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 19,
+    "fields": {
+        "nome": "Monitor",
+        "potencia_media_watts": 50,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 20,
+    "fields": {
+        "nome": "Carregadores",
+        "potencia_media_watts": 15,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 21,
+    "fields": {
+        "nome": "Videogame",
+        "potencia_media_watts": 200,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 22,
+    "fields": {
+        "nome": "Roteador Wifi",
+        "potencia_media_watts": 10,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 23,
+    "fields": {
+        "nome": "Impressora",
+        "potencia_media_watts": 50,
+        "destaque": false
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 24,
+    "fields": {
+        "nome": "Lâmpadas",
+        "potencia_media_watts": 15,
+        "destaque": true
+    }
+},
+{
+    "model": "consumo.eletrodomestico",
+    "pk": 25,
+    "fields": {
+        "nome": "Abajur",
+        "potencia_media_watts": 10,
+        "destaque": false
+    }
+}
+]

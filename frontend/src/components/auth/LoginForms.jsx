@@ -41,7 +41,8 @@ export default function LoginForms() {
         throw new Error(dados.erro || 'Nome de usuário ou senha inválidos.')
       }
 
-      salvarSessao(dados.usuario.username)
+      // Alteração: captura o nome real enviado pelo backend ou usa o username como fallback
+      salvarSessao(dados.usuario.nome || dados.usuario.username)
       navigate('/home', { replace: true, state: { usuario: dados.usuario } })
     } catch (error) {
       setErro(

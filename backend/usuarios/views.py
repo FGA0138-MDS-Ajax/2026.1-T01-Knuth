@@ -38,6 +38,7 @@ def fazer_login(request):
                     "id": usuario.id,
                     "username": usuario.username, # Ajustado para mostrar o username real
                     "email": usuario.email,
+                    "nome": usuario.first_name,
                 }
             }, status=200)
         

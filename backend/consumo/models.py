@@ -21,3 +21,17 @@ class SimulacaoConsumo(models.Model):
 
     def __str__(self):
         return f"{self.titulo} - {self.total_consumo_mensal_kwh} kWh"
+
+##inserindo a RF03
+#unico objetivo e termos a lista 
+#coloquei o watts para agilizar e facilitar a inserção da RF04
+class Eletrodomestico(models.Model):
+    nome = models.CharField(max_length=100, unique=True)
+    potencia_media_watts = models.PositiveIntegerField(help_text="Potência média em Watts")
+    destaque = models.BooleanField(default=False, help_text="Aparece no Top 10 inicial da tela")
+
+    class Meta:
+        ordering = ["nome"]
+
+    def __str__(self):
+        return f"{self.nome} ({self.potencia_media_watts}W)"
