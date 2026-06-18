@@ -167,44 +167,43 @@ def normalizar_texto(texto): #função para normalizar o texto de busca, removen
 
     return texto_sem_acento
 
-##RF03 apenas uma lista dos eletrodomesticos
-#inserção de media de watts para agilizar calculo da RF04
+##listar eletrodomesticos atualizado para RF04
 
 @require_http_methods(["GET"])
 def listar_eletrodomesticos(request):
-    pesquisa = request.GET.get("busca", "").strip()
-
+    pesquisa = request.GET.get("pesquisa", "")
+    eletrodomesticos = Eletrodomestico.objects.all()
     if pesquisa:
         pesquisa_normalizada = normalizar_texto(pesquisa)
-
-        todos_eletrodomesticos = Eletrodomestico.objects.all()
-
-        eletrodomesticos = [
-            eletro for eletro in todos_eletrodomesticos
-            if pesquisa_normalizada in normalizar_texto(eletro.nome)
-        ]
-
-        if not eletrodomesticos:
-            return JsonResponse(
-                {
-                    "ok": True,
-                    "mensagem": "Não temos informações energéticas sobre este eletrodoméstico.",
-                    "eletrodomesticos": []
-                },
-                status=200,
-            )
-    else:
-        eletrodomesticos = Eletrodomestico.objects.filter(destaque=True)[:10]
-
+        eletrodomesticos_filtrados = []
+        for eletrodomestico in eletrodomesticos:
+            nome_normalizado = normalizar_texto(eletrodomestico.nome)
+            if pesquisa_normalizada in nome_normalizado:
+                eletrodomesticos_filtrados.append(eletrodomestico)
+        eletrodomesticos = eletrodomesticos_filtrados
     dados = []
+    for eletrodomestico in eletrodomesticos:
+        calculo = MotorCalculoEnergetico.calcular_consumo_eletrodomestico(
+            potencia_watts=eletrodomestico.potencia_media_watts,
+            tempo_minutos=eletrodomestico.tempo_medio_uso_minutos,
+            tarifa_kwh=Decimal("0.85")
+        )
 
-    for eletro in eletrodomesticos:
-        dados.append({
-            "id": eletro.id,
-            "nome": eletro.nome,
-            "potencia_media_watts": eletro.potencia_media_watts,
-            "destaque": eletro.destaque
-        })
+        dados.append(
+            {
+                "id": eletrodomestico.id,
+                "nome": eletrodomestico.nome,
+                "potencia_media_watts": eletrodomestico.potencia_media_watts,
+                "descricao_uso": eletrodomestico.descricao_uso,
+                "tempo_medio_uso_minutos": eletrodomestico.tempo_medio_uso_minutos,
+                "destaque": eletrodomestico.destaque,
+                "consumo_estimado_kwh": str(calculo["consumo_estimado_kwh"]),
+                "custo_estimado_reais": str(calculo["custo_estimado_reais"]),
+                "tarifa_utilizada": str(calculo["tarifa_utilizada"]),
+                "bandeira_tarifaria": calculo["bandeira_tarifaria"],
+                "observacao": calculo["observacao"],
+            }
+        )
 
     return JsonResponse(
         {

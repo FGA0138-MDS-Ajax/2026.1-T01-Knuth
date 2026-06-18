@@ -27,8 +27,26 @@ class SimulacaoConsumo(models.Model):
 #coloquei o watts para agilizar e facilitar a inserção da RF04
 class Eletrodomestico(models.Model):
     nome = models.CharField(max_length=100, unique=True)
-    potencia_media_watts = models.PositiveIntegerField(help_text="Potência média em Watts")
-    destaque = models.BooleanField(default=False, help_text="Aparece no Top 10 inicial da tela")
+
+    potencia_media_watts = models.PositiveIntegerField(
+        help_text="Potência média em Watts"
+    )
+
+    tempo_medio_uso_minutos = models.PositiveIntegerField(
+        default=60,
+        help_text="Tempo médio de uso em minutos"
+    )
+
+    descricao_uso = models.CharField(
+        max_length=120,
+        default="Tempo médio de uso",
+        help_text="Descrição amigável do uso médio"
+    )
+
+    destaque = models.BooleanField(
+        default=False,
+        help_text="Aparece no Top 10 inicial da tela"
+    )
 
     class Meta:
         ordering = ["nome"]
