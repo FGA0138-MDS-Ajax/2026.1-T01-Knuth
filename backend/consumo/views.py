@@ -171,16 +171,31 @@ def normalizar_texto(texto): #função para normalizar o texto de busca, removen
 
 @require_http_methods(["GET"])
 def listar_eletrodomesticos(request):
-    pesquisa = request.GET.get("pesquisa", "")
-    eletrodomesticos = Eletrodomestico.objects.all()
-    if pesquisa:
-        pesquisa_normalizada = normalizar_texto(pesquisa)
-        eletrodomesticos_filtrados = []
-        for eletrodomestico in eletrodomesticos:
-            nome_normalizado = normalizar_texto(eletrodomestico.nome)
-            if pesquisa_normalizada in nome_normalizado:
-                eletrodomesticos_filtrados.append(eletrodomestico)
-        eletrodomesticos = eletrodomesticos_filtrados
+    # Lê o parâmetro "busca" — mesmo nome que o frontend envia
+    busca = request.GET.get("busca", "").strip()
+
+    if busca:
+        # Busca em todo o catálogo com normalização de acentos/case
+        busca_normalizada = normalizar_texto(busca)
+        todos = Eletrodomestico.objects.all()
+        eletrodomesticos = [
+            e for e in todos
+            if busca_normalizada in normalizar_texto(e.nome)
+        ]
+
+        if not eletrodomesticos:
+            return JsonResponse(
+                {
+                    "ok": True,
+                    "mensagem": "Não temos informações energéticas sobre este eletrodoméstico.",
+                    "eletrodomesticos": [],
+                },
+                status=200,
+            )
+    else:
+        # Sem busca: exibe apenas os destaques (Top 10 da tela inicial)
+        eletrodomesticos = list(Eletrodomestico.objects.filter(destaque=True)[:10])
+
     dados = []
     for eletrodomestico in eletrodomesticos:
         calculo = MotorCalculoEnergetico.calcular_consumo_eletrodomestico(
