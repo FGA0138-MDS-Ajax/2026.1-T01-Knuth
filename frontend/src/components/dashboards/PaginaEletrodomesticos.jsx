@@ -14,13 +14,38 @@ function CardEletrodomestico({ item, destaque }) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="font-semibold text-slate-800 truncate">{item.nome}</h3>
-          <p className="mt-1 text-sm text-slate-500">Potência média</p>
+          <p className="mt-1 text-sm text-slate-500">{item.descricao_uso || 'Potência média'}</p>
         </div>
         <div className="shrink-0 rounded-lg bg-white/80 px-3 py-1.5 text-right shadow-sm">
           <span className="text-lg font-bold text-emerald-600">{item.potencia_media_watts}</span>
           <span className="ml-0.5 text-xs font-medium text-slate-500">W</span>
         </div>
       </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-3 border-t border-slate-100 pt-3">
+        <div>
+          <p className="text-xs font-medium text-slate-400">Consumo estimado</p>
+          <p className="text-sm font-semibold text-slate-700">
+            {item.consumo_estimado_kwh}
+            <span className="ml-1 text-xs font-normal text-slate-400">kWh</span>
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs font-medium text-slate-400">Custo estimado</p>
+          <p className="text-sm font-semibold text-emerald-600">
+            R$ {item.custo_estimado_reais}
+          </p>
+        </div>
+      </div>
+
+      {(item.tempo_medio_uso_minutos || item.bandeira_tarifaria) && (
+        <p className="mt-2 text-[11px] leading-snug text-slate-400">
+          {item.tempo_medio_uso_minutos
+            ? `Baseado em ${item.tempo_medio_uso_minutos} min de uso`
+            : ''}
+          {item.bandeira_tarifaria ? ` · bandeira ${item.bandeira_tarifaria}` : ''}
+        </p>
+      )}
     </div>
   );
 }
@@ -100,7 +125,7 @@ export default function PaginaEletrodomesticos() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-slate-900">Eletrodomésticos</h1>
             <p className="mt-1 text-slate-500">
-              Consulte a potência média dos aparelhos mais comuns ou pesquise outros itens do catálogo.
+              Veja a potência, o consumo médio estimado (kWh) e o custo aproximado dos aparelhos mais comuns, ou pesquise outros itens do catálogo.
             </p>
           </div>
 

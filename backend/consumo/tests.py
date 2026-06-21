@@ -66,6 +66,54 @@ class MotorCalculoEnergeticoTest(SimpleTestCase):
         eletro = Eletrodomestico(nome="Micro-ondas", potencia_media_watts=1200, destaque=True)
         self.assertEqual(str(eletro), "Micro-ondas (1200W)")
 
+    # --------------------------------------------------------------------------
+    # TESTES UNITÁRIOS — calcular_consumo_eletrodomestico (RF04)
+    # --------------------------------------------------------------------------
+
+    def test_calcula_consumo_eletrodomestico_valores_validos(self):
+        """Chuveiro 5500W por 10 minutos: consumo esperado 0.92 kWh e custo R$ 0.78."""
+        resultado = MotorCalculoEnergetico.calcular_consumo_eletrodomestico(
+            potencia_watts=5500,
+            tempo_minutos=10,
+            tarifa_kwh=Decimal("0.85")
+        )
+        self.assertEqual(resultado["consumo_estimado_kwh"], Decimal("0.92"))
+        self.assertEqual(resultado["custo_estimado_reais"], Decimal("0.78"))
+        self.assertEqual(resultado["tarifa_utilizada"], Decimal("0.85"))
+        self.assertEqual(resultado["bandeira_tarifaria"], "verde")
+
+    def test_calcula_consumo_eletrodomestico_potencia_zero(self):
+        """Potência zero deve lançar CalculoEnergeticoError."""
+        with self.assertRaises(CalculoEnergeticoError) as ctx:
+            MotorCalculoEnergetico.calcular_consumo_eletrodomestico(
+                potencia_watts=0, tempo_minutos=10, tarifa_kwh=Decimal("0.85")
+            )
+        self.assertEqual(str(ctx.exception), "A potência deve ser maior que zero.")
+
+    def test_calcula_consumo_eletrodomestico_tempo_zero(self):
+        """Tempo de uso zero deve lançar CalculoEnergeticoError."""
+        with self.assertRaises(CalculoEnergeticoError) as ctx:
+            MotorCalculoEnergetico.calcular_consumo_eletrodomestico(
+                potencia_watts=1000, tempo_minutos=0, tarifa_kwh=Decimal("0.85")
+            )
+        self.assertEqual(str(ctx.exception), "O tempo de uso deve ser maior que zero.")
+
+    def test_calcula_consumo_eletrodomestico_tarifa_zero(self):
+        """Tarifa zero deve lançar CalculoEnergeticoError."""
+        with self.assertRaises(CalculoEnergeticoError) as ctx:
+            MotorCalculoEnergetico.calcular_consumo_eletrodomestico(
+                potencia_watts=1000, tempo_minutos=30, tarifa_kwh=Decimal("0")
+            )
+        self.assertEqual(str(ctx.exception), "A tarifa deve ser maior que zero.")
+
+    def test_calcula_consumo_eletrodomestico_valores_nao_numericos(self):
+        """Valores não numéricos devem lançar CalculoEnergeticoError."""
+        with self.assertRaises(CalculoEnergeticoError) as ctx:
+            MotorCalculoEnergetico.calcular_consumo_eletrodomestico(
+                potencia_watts="mil", tempo_minutos=30, tarifa_kwh=Decimal("0.85")
+            )
+        self.assertIn("numéricos", str(ctx.exception))
+
 
 # ==============================================================================
 # 2. TESTES DE INTEGRAÇÃO (Foco nas Rotas da API e Banco de Dados - views.py)
@@ -155,30 +203,90 @@ class EletrodomesticosAPITests(TestCase):
         self.usuario = User.objects.create_user(username="teste_eletro", password="123")
         self.url_listagem = reverse("listar-eletrodomesticos")
 
-        # Ajustado para criar dois registros destacados (True), pois o backend filtra para exibir apenas destaques
-        Eletrodomestico.objects.create(nome="Geladeira", potencia_media_watts=250, destaque=True)
-        Eletrodomestico.objects.create(nome="Refrigerador", potencia_media_watts=300, destaque=True)
+        # Apenas itens com destaque=True aparecem na listagem padrão (Top 10)
+        self.geladeira = Eletrodomestico.objects.create(
+            nome="Geladeira",
+            potencia_media_watts=250,
+            tempo_medio_uso_minutos=240,
+            descricao_uso="Funcionamento efetivo estimado em 4 horas por dia",
+            destaque=True
+        )
+        self.refrigerador = Eletrodomestico.objects.create(
+            nome="Refrigerador",
+            potencia_media_watts=300,
+            tempo_medio_uso_minutos=240,
+            descricao_uso="Funcionamento efetivo estimado em 4 horas por dia",
+            destaque=True
+        )
+        # Item sem destaque — só aparece na busca
+        self.fogao = Eletrodomestico.objects.create(
+            nome="Fogão",
+            potencia_media_watts=50,
+            tempo_medio_uso_minutos=15,
+            descricao_uso="Uso aproximado de 15 minutos",
+            destaque=False
+        )
 
-    def test_api_permite_listagem_de_eletrodomesticos_deslogado(self):
-        """Corrigido: Alinhado com o backend real que mantém a rota de catálogo pública."""
+    def test_api_listagem_padrao_retorna_apenas_destaques(self):
+        """Sem busca, a API deve retornar apenas os itens com destaque=True."""
         resposta = self.client.get(self.url_listagem)
         self.assertEqual(resposta.status_code, 200)
+        dados = resposta.json()
+        self.assertEqual(len(dados["eletrodomesticos"]), 2)
+        for item in dados["eletrodomesticos"]:
+            self.assertTrue(item["destaque"])
 
-    def test_api_retorna_todos_os_eletrodomesticos_quando_autenticado(self):
-        """Valida que a API devolve todos os dados injetados com a estrutura de chaves que o front-end mapeia."""
+    def test_api_listagem_retorna_campos_completos_da_rf04(self):
+        """Valida que a API devolve todos os campos exigidos pela RF04."""
         self.client.login(username="teste_eletro", password="123")
         resposta = self.client.get(self.url_listagem)
 
         self.assertEqual(resposta.status_code, 200)
         dados = resposta.json()
+        self.assertGreater(len(dados["eletrodomesticos"]), 0)
 
-        # Agora a asserção passará perfeitamente dado o filtro de destaques da view
-        self.assertEqual(len(dados["eletrodomesticos"]), 2)
+        item = dados["eletrodomesticos"][0]
+        # Campos básicos (RF03)
+        self.assertIn("nome", item)
+        self.assertIn("potencia_media_watts", item)
+        self.assertIn("destaque", item)
+        # Campos novos da RF04
+        self.assertIn("consumo_estimado_kwh", item)
+        self.assertIn("custo_estimado_reais", item)
+        self.assertIn("descricao_uso", item)
+        self.assertIn("tempo_medio_uso_minutos", item)
+        self.assertIn("tarifa_utilizada", item)
+        self.assertIn("bandeira_tarifaria", item)
+        self.assertIn("observacao", item)
 
-        primeiro_item = dados["eletrodomesticos"][0]
-        self.assertIn("nome", primeiro_item)
-        self.assertIn("potencia_media_watts", primeiro_item)
-        self.assertIn("destaque", primeiro_item)
+    def test_api_busca_pelo_parametro_correto(self):
+        """A busca deve usar o parâmetro 'busca' e encontrar item não-destaque."""
+        resposta = self.client.get(self.url_listagem, {"busca": "fog"})
+        self.assertEqual(resposta.status_code, 200)
+        dados = resposta.json()
+        # O fogão não é destaque, mas deve aparecer na busca
+        self.assertEqual(len(dados["eletrodomesticos"]), 1)
+        self.assertEqual(dados["eletrodomesticos"][0]["nome"], "Fogão")
 
-        self.assertTrue(dados["eletrodomesticos"][0]["destaque"])
-        self.assertTrue(dados["eletrodomesticos"][1]["destaque"])
+    def test_api_busca_sem_resultado_retorna_mensagem(self):
+        """Busca que não encontra nada deve retornar HTTP 200 com mensagem informativa."""
+        resposta = self.client.get(self.url_listagem, {"busca": "eletrodomestico_inexistente_xyz"})
+        self.assertEqual(resposta.status_code, 200)
+        dados = resposta.json()
+        self.assertTrue(dados["ok"])
+        self.assertEqual(dados["eletrodomesticos"], [])
+        self.assertIn("mensagem", dados)
+        self.assertIn("inform", dados["mensagem"])  # valida que a mensagem é informativa
+
+    def test_api_busca_normaliza_acentos(self):
+        """A busca deve encontrar 'Fogão' ao digitar 'fogao' (sem acento)."""
+        resposta = self.client.get(self.url_listagem, {"busca": "fogao"})
+        self.assertEqual(resposta.status_code, 200)
+        dados = resposta.json()
+        self.assertEqual(len(dados["eletrodomesticos"]), 1)
+        self.assertEqual(dados["eletrodomesticos"][0]["nome"], "Fogão")
+
+    def test_api_permite_listagem_deslogado(self):
+        """O catálogo de eletrodomésticos é público — não exige login."""
+        resposta = self.client.get(self.url_listagem)
+        self.assertEqual(resposta.status_code, 200)

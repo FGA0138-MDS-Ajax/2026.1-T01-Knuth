@@ -1,227 +1,277 @@
 [
-{
+  {
     "model": "consumo.eletrodomestico",
     "pk": 1,
     "fields": {
-        "nome": "Geladeira",
-        "potencia_media_watts": 250,
-        "destaque": true
+      "nome": "Geladeira",
+      "potencia_media_watts": 250,
+      "tempo_medio_uso_minutos": 240,
+      "descricao_uso": "Funcionamento efetivo estimado em 4 horas por dia",
+      "destaque": true
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 2,
     "fields": {
-        "nome": "Refrigerador",
-        "potencia_media_watts": 300,
-        "destaque": false
+      "nome": "Refrigerador",
+      "potencia_media_watts": 300,
+      "tempo_medio_uso_minutos": 240,
+      "descricao_uso": "Funcionamento efetivo estimado em 4 horas por dia",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 3,
     "fields": {
-        "nome": "Fogão",
-        "potencia_media_watts": 50,
-        "destaque": false
+      "nome": "Fogão",
+      "potencia_media_watts": 50,
+      "tempo_medio_uso_minutos": 15,
+      "descricao_uso": "Uso aproximado de 15 minutos",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 4,
     "fields": {
-        "nome": "Micro-ondas",
-        "potencia_media_watts": 1200,
-        "destaque": true
+      "nome": "Micro-ondas",
+      "potencia_media_watts": 1200,
+      "tempo_medio_uso_minutos": 10,
+      "descricao_uso": "Uso aproximado de 10 minutos",
+      "destaque": true
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 5,
     "fields": {
-        "nome": "Máquina de lavar roupa",
-        "potencia_media_watts": 500,
-        "destaque": true
+      "nome": "Máquina de lavar roupa",
+      "potencia_media_watts": 500,
+      "tempo_medio_uso_minutos": 90,
+      "descricao_uso": "Ciclo de lavagem de aproximadamente 1h30",
+      "destaque": true
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 6,
     "fields": {
-        "nome": "Máquina de lavar louça",
-        "potencia_media_watts": 1500,
-        "destaque": false
+      "nome": "Máquina de lavar louça",
+      "potencia_media_watts": 1500,
+      "tempo_medio_uso_minutos": 120,
+      "descricao_uso": "Ciclo de lavagem de aproximadamente 2 horas",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 7,
     "fields": {
-        "nome": "Air fryer",
-        "potencia_media_watts": 1500,
-        "destaque": true
+      "nome": "Air fryer",
+      "potencia_media_watts": 1500,
+      "tempo_medio_uso_minutos": 30,
+      "descricao_uso": "Uso aproximado de 30 minutos",
+      "destaque": true
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 8,
     "fields": {
-        "nome": "Liquidificador",
-        "potencia_media_watts": 300,
-        "destaque": false
+      "nome": "Liquidificador",
+      "potencia_media_watts": 300,
+      "tempo_medio_uso_minutos": 5,
+      "descricao_uso": "Uso aproximado de 5 minutos",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 9,
     "fields": {
-        "nome": "Sanduicheira",
-        "potencia_media_watts": 750,
-        "destaque": false
+      "nome": "Sanduicheira",
+      "potencia_media_watts": 750,
+      "tempo_medio_uso_minutos": 10,
+      "descricao_uso": "Uso aproximado de 10 minutos",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 10,
     "fields": {
-        "nome": "Filtro",
-        "potencia_media_watts": 100,
-        "destaque": false
+      "nome": "Filtro",
+      "potencia_media_watts": 100,
+      "tempo_medio_uso_minutos": 60,
+      "descricao_uso": "Uso aproximado de 1 hora",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 11,
     "fields": {
-        "nome": "Ferro de passar",
-        "potencia_media_watts": 1000,
-        "destaque": true
+      "nome": "Ferro de passar",
+      "potencia_media_watts": 1000,
+      "tempo_medio_uso_minutos": 30,
+      "descricao_uso": "Uso aproximado de 30 minutos",
+      "destaque": true
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 12,
     "fields": {
-        "nome": "Aspirador de pó",
-        "potencia_media_watts": 1000,
-        "destaque": false
+      "nome": "Aspirador de pó",
+      "potencia_media_watts": 1000,
+      "tempo_medio_uso_minutos": 30,
+      "descricao_uso": "Uso aproximado de 30 minutos",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 13,
     "fields": {
-        "nome": "Ventilador",
-        "potencia_media_watts": 100,
-        "destaque": false
+      "nome": "Ventilador",
+      "potencia_media_watts": 100,
+      "tempo_medio_uso_minutos": 480,
+      "descricao_uso": "Uso aproximado de 8 horas",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 14,
     "fields": {
-        "nome": "Ar condicionado",
-        "potencia_media_watts": 1500,
-        "destaque": true
+      "nome": "Ar condicionado",
+      "potencia_media_watts": 1500,
+      "tempo_medio_uso_minutos": 480,
+      "descricao_uso": "Uso aproximado de 8 horas",
+      "destaque": true
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 15,
     "fields": {
-        "nome": "Chuveiro",
-        "potencia_media_watts": 5500,
-        "destaque": true
+      "nome": "Chuveiro",
+      "potencia_media_watts": 5500,
+      "tempo_medio_uso_minutos": 10,
+      "descricao_uso": "Banho de aproximadamente 10 minutos",
+      "destaque": true
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 16,
     "fields": {
-        "nome": "Secador de cabelo",
-        "potencia_media_watts": 1500,
-        "destaque": false
+      "nome": "Secador de cabelo",
+      "potencia_media_watts": 1500,
+      "tempo_medio_uso_minutos": 10,
+      "descricao_uso": "Uso aproximado de 10 minutos",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 17,
     "fields": {
-        "nome": "Televisão",
-        "potencia_media_watts": 150,
-        "destaque": true
+      "nome": "Televisão",
+      "potencia_media_watts": 150,
+      "tempo_medio_uso_minutos": 240,
+      "descricao_uso": "Uso aproximado de 4 horas",
+      "destaque": true
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 18,
     "fields": {
-        "nome": "Computador",
-        "potencia_media_watts": 300,
-        "destaque": true
+      "nome": "Computador",
+      "potencia_media_watts": 300,
+      "tempo_medio_uso_minutos": 240,
+      "descricao_uso": "Uso aproximado de 4 horas",
+      "destaque": true
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 19,
     "fields": {
-        "nome": "Monitor",
-        "potencia_media_watts": 50,
-        "destaque": false
+      "nome": "Monitor",
+      "potencia_media_watts": 50,
+      "tempo_medio_uso_minutos": 240,
+      "descricao_uso": "Uso aproximado de 4 horas",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 20,
     "fields": {
-        "nome": "Carregadores",
-        "potencia_media_watts": 15,
-        "destaque": false
+      "nome": "Carregadores",
+      "potencia_media_watts": 15,
+      "tempo_medio_uso_minutos": 120,
+      "descricao_uso": "Uso aproximado de 2 horas",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 21,
     "fields": {
-        "nome": "Videogame",
-        "potencia_media_watts": 200,
-        "destaque": false
+      "nome": "Videogame",
+      "potencia_media_watts": 200,
+      "tempo_medio_uso_minutos": 120,
+      "descricao_uso": "Uso aproximado de 2 horas",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 22,
     "fields": {
-        "nome": "Roteador Wifi",
-        "potencia_media_watts": 10,
-        "destaque": false
+      "nome": "Roteador Wifi",
+      "potencia_media_watts": 10,
+      "tempo_medio_uso_minutos": 1440,
+      "descricao_uso": "Uso contínuo durante 24 horas",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 23,
     "fields": {
-        "nome": "Impressora",
-        "potencia_media_watts": 50,
-        "destaque": false
+      "nome": "Impressora",
+      "potencia_media_watts": 50,
+      "tempo_medio_uso_minutos": 15,
+      "descricao_uso": "Uso aproximado de 15 minutos",
+      "destaque": false
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 24,
     "fields": {
-        "nome": "Lâmpadas",
-        "potencia_media_watts": 15,
-        "destaque": true
+      "nome": "Lâmpadas",
+      "potencia_media_watts": 15,
+      "tempo_medio_uso_minutos": 300,
+      "descricao_uso": "Uso aproximado de 5 horas",
+      "destaque": true
     }
-},
-{
+  },
+  {
     "model": "consumo.eletrodomestico",
     "pk": 25,
     "fields": {
-        "nome": "Abajur",
-        "potencia_media_watts": 10,
-        "destaque": false
+      "nome": "Abajur",
+      "potencia_media_watts": 10,
+      "tempo_medio_uso_minutos": 120,
+      "descricao_uso": "Uso aproximado de 2 horas",
+      "destaque": false
     }
-}
+  }
 ]
