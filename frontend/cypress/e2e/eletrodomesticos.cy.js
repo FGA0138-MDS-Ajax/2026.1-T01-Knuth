@@ -76,7 +76,7 @@ describe('Módulo de Eletrodomésticos (Testes de Sistema E2E)', () => {
         cy.get('div').contains('🔍').should('be.visible'); //
       } else {
         // Se a API retornou o array vazio puramente
-        cy.get('p').contains('Nenhum eletrodoméstico encontrado.').should('be.visible'); //
+        cy.get('p').contains('Não temos informações energéticas sobre este eletrodoméstico.').should('be.visible'); //
       }
     });
   });
