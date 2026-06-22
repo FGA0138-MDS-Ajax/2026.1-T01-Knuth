@@ -1,9 +1,27 @@
-site_name: Documentação
+site_name: EducaEnergia - Grupo Knuth
 
-nav:
-  - Index: "index.md"
-  - Exemplo: "exemplo.md"
-  - PastaExemplo:
-    - SubpastaExemplo1: "SubPastaExemplo/SubPastaExemplo.md"
-theme:
+theme: 
   name: material
+  language: pt-BR
+  logo: assets/images/icon_educa_energia.png
+
+plugins:
+  - search
+  - mkdocstrings
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences
+
+
+nav: 
+  - Documentos: 
+    - Documento de Visão: documentos/doc_visao.md
+    - Documento de Arquitetura: documentos/doc_arq.md
+  - ATAS: atas/index.md
+  - Listas de Presenças: presencas/index.md
+
+

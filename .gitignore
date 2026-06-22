@@ -2,7 +2,7 @@
 # 🐍 Python Virtual Environment (Venv)
 # ----------------------------------------
 # Ignora a pasta 'venv' na raiz do projeto
-/venv/
+/.venv/
 
 # ----------------------------------------
 # 📁 MkDocs e Artefatos Gerados
