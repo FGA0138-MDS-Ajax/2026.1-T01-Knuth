@@ -1,6 +1,6 @@
-# Documentos do Grupo Knuth
+# Arquivos em PDF
 
-Aqui você encontra a documentação oficial do projeto EducaEnergia desenvolvida pelo Grupo Knuth. Clique nos botões abaixo para acessar os arquivos:
+Aqui você encontra a documentação oficial do projeto EducaEnergia desenvolvida pelo Grupo Knuth. Clique nos botões abaixo para baixar os arquivos em formato .pdf:
 
 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
 

@@ -9,6 +9,15 @@ theme:
   language: pt-BR
   logo: assets/images/icon_educa_energia.png
   favicon: assets/images/icon_educa_energia.png
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Modo claro
+    - scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Modo escuro
 
 plugins:
   - search
@@ -20,10 +29,15 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.superfences
+  - md_in_html #extensão para o html funcionar no meio do .md
 
+extra_css:
+  - stylesheets/extra.css
 
+  
 nav: 
-  - Documentos: 
+  - Documentos:
+    - documentos/index.md
     - Documento de Visão: documentos/doc_visao.md
     - Documento de Arquitetura: documentos/doc_arq.md
   - ATAS: atas/index.md
