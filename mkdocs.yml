@@ -1,9 +1,14 @@
 site_name: EducaEnergia - Grupo Knuth
+site_url: https://fga0138-mds-ajax.github.io/2026.1-T01-Knuth/
+repo_url: https://github.com/FGA0138-MDS-Ajax/2026.1-T01-Knuth
+repo_name: 2026.1-T01-Knuth
+
 
 theme: 
   name: material
   language: pt-BR
   logo: assets/images/icon_educa_energia.png
+  favicon: assets/images/icon_educa_energia.png
 
 plugins:
   - search
