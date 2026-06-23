@@ -273,36 +273,6 @@ export default function PaginaConsumoMedio() {
                     </div>
                   </div>
 
-                  {/* Exibição da Estimativa (RF05) */}
-                  {resultado.custo_estimado_reais && (
-                    <div className={`rounded-xl border p-5 shadow-sm transition-colors ${
-                      resultado.status_consumo === 'abaixo_da_media' 
-                        ? 'border-emerald-200 bg-emerald-50' 
-                        : resultado.status_consumo === 'na_media' 
-                        ? 'border-blue-200 bg-blue-50'
-                        : 'border-rose-200 bg-rose-50'
-                    }`}>
-                      <p className={`text-sm ${
-                        resultado.status_consumo === 'abaixo_da_media' ? 'text-emerald-700' :
-                        resultado.status_consumo === 'na_media' ? 'text-blue-700' : 'text-rose-700'
-                      }`}>Estimativa de impacto na conta (Tarifa base R$ 0,85)</p>
-                      
-                      <p className={`mt-1 text-2xl font-bold ${
-                        resultado.status_consumo === 'abaixo_da_media' ? 'text-emerald-900' :
-                        resultado.status_consumo === 'na_media' ? 'text-blue-900' : 'text-rose-900'
-                      }`}>
-                        R$ {resultado.custo_estimado_reais}
-                      </p>
-                      
-                      <p className={`mt-3 text-sm ${
-                        resultado.status_consumo === 'abaixo_da_media' ? 'text-emerald-800' :
-                        resultado.status_consumo === 'na_media' ? 'text-blue-800' : 'text-rose-800'
-                      }`}>
-                        <strong>Recomendação:</strong> {resultado.recomendacao}
-                      </p>
-                    </div>
-                  )}
-
                   <div>
                     <h2 className="mb-3 text-sm font-semibold text-slate-700">
                       Consumo por mês

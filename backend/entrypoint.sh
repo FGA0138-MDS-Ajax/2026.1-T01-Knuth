@@ -33,10 +33,5 @@ done
 echo "PostgreSQL pronto. Aplicando migrations..."
 python manage.py migrate
 
-if [ "$#" -eq 0 ]; then
-  echo "Iniciando servidor Django..."
-  exec python manage.py runserver 0.0.0.0:8000
-else
-  echo "Executando comando customizado..."
-  exec "$@"
-fi
+echo "Iniciando servidor Django..."
+exec python manage.py runserver 0.0.0.0:8000

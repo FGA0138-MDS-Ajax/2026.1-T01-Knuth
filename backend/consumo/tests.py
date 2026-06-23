@@ -21,33 +21,12 @@ class MotorCalculoEnergeticoTest(SimpleTestCase):
         self.assertEqual(resultado_3["meses_analisados"], 3)
         self.assertEqual(resultado_3["consumo_total_kwh"], Decimal("450.00"))
         self.assertEqual(resultado_3["consumo_medio_mensal_kwh"], Decimal("150.00"))
-        self.assertEqual(resultado_3["status_consumo"], "na_media")
 
         # Teste com 6 meses (Valida arredondamento de dízima: 950 / 6 = 158.3333...)
         resultado_6 = MotorCalculoEnergetico.calcular_media_mensal([100, 150, 200, 100, 150, 250])
         self.assertEqual(resultado_6["meses_analisados"], 6)
         self.assertEqual(resultado_6["consumo_total_kwh"], Decimal("950.00"))
         self.assertEqual(resultado_6["consumo_medio_mensal_kwh"], Decimal("158.33"))
-
-    def test_estimativa_impacto_rf05(self):
-        """Valida os status e recomendações da RF05 (abaixo, na média e acima)."""
-        # Abaixo da média (< 150)
-        resultado_abaixo = MotorCalculoEnergetico.calcular_media_mensal([100, 100, 100])
-        self.assertEqual(resultado_abaixo["status_consumo"], "abaixo_da_media")
-        self.assertEqual(resultado_abaixo["custo_estimado_reais"], Decimal("85.00"))
-        self.assertIn("Parabéns", resultado_abaixo["recomendacao"])
-
-        # Na média (150 a 250)
-        resultado_medio = MotorCalculoEnergetico.calcular_media_mensal([200, 200, 200])
-        self.assertEqual(resultado_medio["status_consumo"], "na_media")
-        self.assertEqual(resultado_medio["custo_estimado_reais"], Decimal("170.00"))
-        self.assertIn("dentro da média", resultado_medio["recomendacao"])
-
-        # Acima da média (> 250)
-        resultado_acima = MotorCalculoEnergetico.calcular_media_mensal([300, 300, 300])
-        self.assertEqual(resultado_acima["status_consumo"], "acima_da_media")
-        self.assertEqual(resultado_acima["custo_estimado_reais"], Decimal("255.00"))
-        self.assertIn("seu consumo está alto", resultado_acima["recomendacao"])
 
     def test_nao_permite_quantidade_de_meses_invalida(self):
         """O período de análise deve ser obrigatoriamente de 3, 6 ou 9 meses."""
@@ -157,8 +136,6 @@ class ConsumoAPITests(TestCase):
         dados_resposta = resposta.json()
         self.assertTrue(dados_resposta["ok"])
         self.assertEqual(dados_resposta["resultado"]["consumo_medio_mensal_kwh"], "150.00")
-        self.assertEqual(dados_resposta["resultado"]["status_consumo"], "na_media")
-        self.assertIn("custo_estimado_reais", dados_resposta["resultado"])
 
     def test_api_calcular_consumo_medio_erro_validacao(self):
         """Valida se erros do motor retornam HTTP 400 mapeados pela view."""
