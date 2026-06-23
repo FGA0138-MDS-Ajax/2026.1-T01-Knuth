@@ -14,6 +14,12 @@ class SimulacaoConsumo(models.Model):
     meses_analisados = models.PositiveBigIntegerField(default=3)
     total_consumo_mensal_kwh = models.DecimalField(max_digits=12, decimal_places=2)
     consumo_medio_mensal_kwh = models.DecimalField(max_digits=12, decimal_places=2)
+    
+    # RF05: Estimativa de impacto financeiro e recomendação
+    custo_estimado_reais = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    status_consumo = models.CharField(max_length=30, default="na_media")
+    recomendacao = models.TextField(blank=True, default="")
+    
     criado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:

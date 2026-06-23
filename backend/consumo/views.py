@@ -87,6 +87,9 @@ def criar_simulacao_view(request):
             meses_analisados=resultado["meses_analisados"],
             total_consumo_mensal_kwh=resultado["consumo_total_kwh"],
             consumo_medio_mensal_kwh=resultado["consumo_medio_mensal_kwh"],
+            custo_estimado_reais=resultado["custo_estimado_reais"],
+            status_consumo=resultado["status_consumo"],
+            recomendacao=resultado["recomendacao"],
         )
 
         return JsonResponse(
@@ -141,6 +144,9 @@ def listar_minhas_simulacoes(request):
                 "meses_analisados": simulacao.meses_analisados,
                 "total_consumo_mensal_kwh": str(simulacao.total_consumo_mensal_kwh),
                 "consumo_medio_mensal_kwh": str(simulacao.consumo_medio_mensal_kwh),
+                "custo_estimado_reais": str(simulacao.custo_estimado_reais),
+                "status_consumo": simulacao.status_consumo,
+                "recomendacao": simulacao.recomendacao,
                 "criado_em": simulacao.criado_em.isoformat(),
             }
         )
