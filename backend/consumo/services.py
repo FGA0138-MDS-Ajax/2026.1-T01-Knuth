@@ -109,32 +109,49 @@ class SimuladorRF05:
         consumo_estimado_mensal = Decimal("0.0")
         aparelhos_para_reduzir = [] # Lista para guardar aparelhos que podem ser otimizados
 
+        #verificar o ar-condicionado
+        tem_ar_condicionado = any(ap.id == 14 for ap in aparelho)
+        if tem_ar_condicionado:
+            limite_ideal = Decimal("350")
+            limite_media = Decimal("450")
+        else:
+            limite_ideal = Decimal("180")
+            limite_media = Decimal("210")
+
+
         # Calcular o consumo estimado de todos os aparelhos juntos
         for aparelho in aparelhos:
             # Fórmula: (Watts * Minutos * 30 dias) / 60000
-            kwh_mensal = (Decimal(aparelho.potencia_media_watts) * Decimal(aparelho.tempo_medio_uso_minutos) * Decimal("30")) / Decimal("60000")
-            consumo_estimado_mensal += kwh_mensal
+            #ignorem #kwh_mensal = (Decimal(aparelho.potencia_media_watts) * Decimal(aparelho.tempo_medio_uso_minutos) * Decimal("30")) / Decimal("60000")
+            #ignorem #consumo_estimado_mensal += kwh_mensal
             
-            # Regra de Exceção: Blindar a Geladeira/Refrigerador (IDs 1 e 2) e Roteador (ID 22)
+            # Regra de negocios: Blindar a Geladeira/Refrigerador (IDs 1 e 2) e Roteador (ID 22)
             if aparelho.id not in [1, 2, 22]:
+                kwh_mensal = (Decimal(aparelho.potencia_media_watts) * Decimal(aparelho.tempo_medio_uso_minutos) * Decimal("30")) / Decimal("60000")
                 aparelhos_para_reduzir.append({
                     "nome": aparelho.nome,
                     "potencia": Decimal(aparelho.potencia_media_watts),
                     "kwh_mensal": kwh_mensal
                 })
+        consumo_real_dec = Decimal(consumo_real_kwh)
 
-        #achar excesso
-        excesso_kwh = Decimal(consumo_real_kwh) - consumo_estimado_mensal
-
-        # 5. Gerar o Status e as Recomendações
-        if excesso_kwh <= 0:
+        # Gerar o Status e as Recomendações
+        if consumo_real_dec <= limite_ideal:
             return {
                 "status_consumo": "dentro_do_ideal",
-                "recomendacao": "Excelente! O seu consumo real está compatível (ou menor) que a estimativa dos seus aparelhos. Continue assim!"
+                "recomendacao": "Excelente! O seu consumo real está compatível (ou menor) que a estimativa dos seus aparelhos ideal para o Distrito Federal. Continue assim!"
+            }
+        
+        elif consumo_real_dec <= limite_media:
+            excesso_kwh = consumo_real_dec - limite_ideal ##se nn esta achar o excesso
+            dicas = SimuladorRF05._calcular_metas_de_reducao(excesso_kwh, aparelhos_para_reduzir)
+            return {
+                "status_consumo": "na_media",
+                "recomendacao": f"Você está na média do DF, mas pode melhorar! Para atingir o nível ideal, você precisa reduzir cerca de {excesso_kwh:.0f} kWh.\n\nTente isto:\n" + dicas
             }
             
         else:
-            
+            excesso_kwh = consumo_real_dec - limite_ideal ##se nn esta achar o excesso
             dicas = SimuladorRF05._calcular_metas_de_reducao(excesso_kwh, aparelhos_para_reduzir)
             
             return {
