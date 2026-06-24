@@ -8,6 +8,8 @@ import PaginaEletrodomesticos from './components/dashboards/PaginaEletrodomestic
 import AnaliseConsumo from './components/dashboards/AnaliseConsumo'
 import RelatorioGastos from './components/dashboards/RelatorioGastos'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import AdminRoute from './components/auth/AdminRoute'
+import EsqueceuSuaSenha from './components/auth/EsqueceuSuaSenha'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { estaLogado } from './config/auth'
 import ListaModulos from './components/dashboards/ListaModulos'
@@ -87,7 +89,22 @@ export default function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="bandeiras" element={<GerenciarBandeiras />} />
+        <Route path="eletrodomesticos" element={<GerenciarEletrodomesticos />} />
+        <Route path="modulos" element={<GerenciarModulos />} />
+        <Route path="quizzes" element={<GerenciarQuizzes />} />
+      </Route>
+       <Route path="/esqueceu-sua-senha" element={<EsqueceuSuaSenha />} />
+    <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   )
 }

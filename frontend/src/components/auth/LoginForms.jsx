@@ -106,6 +106,11 @@ export default function LoginForms() {
             {showPassword ? 'Ocultar' : 'Ver'}
           </button>
         </div>
+        <div className="flex justify-end mt-1">
+          <Link to="/esqueceu-sua-senha" className="text-sm font-medium text-emerald-600 transition hover:text-emerald-500">
+            Esqueceu sua senha?
+          </Link>
+        </div>
       </div>
 
       {erro && (
