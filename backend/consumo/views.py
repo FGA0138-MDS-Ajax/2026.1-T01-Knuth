@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .models import SimulacaoConsumo, Eletrodomestico
-from .services import MotorCalculoEnergetico, CalculoEnergeticoError
+from .services import MotorCalculoEnergetico, CalculoEnergeticoError, SimuladorRF05
 
 logger = logging.getLogger(__name__)
 
@@ -233,3 +233,47 @@ def listar_eletrodomesticos(request):
         },
         status=200,
     )
+
+@csrf_exempt 
+def analise_consumo_rf05(request):
+    if request.method == 'POST': ##enviar
+        try:
+            dados = json.loads(request.body)
+            consumo_real_kwh = dados.get("consumo_real_kwh")
+            ids_eletrodomesticos = dados.get("eletrodomesticos_selecionados", [])
+
+            # Validação básica de segurança para garantir que não venha nada null ou zero para gerar numeros negativos
+            if not consumo_real_kwh or not ids_eletrodomesticos:
+                return JsonResponse(
+                    {"erro": "Por favor, informe o consumo da sua conta de Luz em kWh e selcione o(s) aparelho(s) mais consumido(s)."},
+                    status=400
+                )
+            try:
+                if float(consumo_real_kwh) <= 0:
+                    return JsonResponse(
+                        {"erro:" "O valor da conta de luz deve ser maior que zero"},
+                        status = 400
+                    )
+            except ValueError:
+                return JsonResponse(
+                    {"erro:" "Por favor, digite apenas números válidos em kilo Watt hora (kWh)"},
+                    status=400
+                )
+
+            # Chama o calculo feito no services.py
+            resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
+                consumo_real_kwh=consumo_real_kwh,
+                ids_eletrodomesticos=ids_eletrodomesticos
+            )
+
+            
+            return JsonResponse({"resultado": resultado}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"erro": "Formato de JSON inválido enviado pelo Front-end."}, status=400)
+        except Exception as e:
+            return JsonResponse({"erro": str(e)}, status=500)
+            
+    # Se alguém tentar acessar a rota direto pelo navegador (que é um GET), retorna erro
+    return JsonResponse({"erro": "Método não permitido."}, status=405)
+

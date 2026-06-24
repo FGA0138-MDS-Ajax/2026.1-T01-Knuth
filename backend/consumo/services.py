@@ -1,5 +1,7 @@
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
-
+from .models import Eletrodomestico
+from .services import SimuladorRF05
+from django.test import TestCase
 class CalculoEnergeticoError(ValueError):
     pass
 
@@ -96,3 +98,72 @@ class MotorCalculoEnergetico:
             "bandeira_tarifaria": "verde",
             "observacao": "Valor estimado considerando bandeira verde. Os valores podem variar conforme a bandeira tarifária."
         }
+    
+
+class SimuladorRF05:
+    @staticmethod
+    def gerar_analise_e_recomendacoes(consumo_real_kwh, ids_eletrodomesticos):
+        #buscar os aparelhos selecionados no banco de dados
+        aparelhos = Eletrodomestico.objects.filter(id__in=ids_eletrodomesticos)
+        
+        consumo_estimado_mensal = Decimal("0.0")
+        aparelhos_para_reduzir = [] # Lista para guardar aparelhos que podem ser otimizados
+
+        # Calcular o consumo estimado de todos os aparelhos juntos
+        for aparelho in aparelhos:
+            # Fórmula: (Watts * Minutos * 30 dias) / 60000
+            kwh_mensal = (Decimal(aparelho.potencia_media_watts) * Decimal(aparelho.tempo_medio_uso_minutos) * Decimal("30")) / Decimal("60000")
+            consumo_estimado_mensal += kwh_mensal
+            
+            # Regra de Exceção: Blindar a Geladeira/Refrigerador (IDs 1 e 2) e Roteador (ID 22)
+            if aparelho.id not in [1, 2, 22]:
+                aparelhos_para_reduzir.append({
+                    "nome": aparelho.nome,
+                    "potencia": Decimal(aparelho.potencia_media_watts),
+                    "kwh_mensal": kwh_mensal
+                })
+
+        #achar excesso
+        excesso_kwh = Decimal(consumo_real_kwh) - consumo_estimado_mensal
+
+        # 5. Gerar o Status e as Recomendações
+        if excesso_kwh <= 0:
+            return {
+                "status_consumo": "dentro_do_ideal",
+                "recomendacao": "Excelente! O seu consumo real está compatível (ou menor) que a estimativa dos seus aparelhos. Continue assim!"
+            }
+            
+        else:
+            
+            dicas = SimuladorRF05._calcular_metas_de_reducao(excesso_kwh, aparelhos_para_reduzir)
+            
+            return {
+                "status_consumo": "acima_do_ideal",
+                "recomendacao": f"Notamos um excesso de aproximadamente {excesso_kwh:.0f} kWh. Para equilibrar sua conta, tente as seguintes metas diárias:\n" + dicas
+            }
+
+    @staticmethod
+    def _calcular_metas_de_reducao(excesso_kwh, aparelhos_para_reduzir):
+        """
+        Engenharia reversa: Transforma os kWh excedentes em minutos para reduzir.
+        """
+        if not aparelhos_para_reduzir:
+            return "Verifique se não existem luzes acesas ou equipamentos em stand-by consumindo energia extra."
+
+        # Ordenar os aparelhos de maior potencia 
+        aparelhos_ordenados = sorted(aparelhos_para_reduzir, key=lambda x: x["potencia"], reverse=True)
+        
+        #começar pelo de maior potencia
+        vilao = aparelhos_ordenados[0]
+        
+        # Fórmula inversa para descobrir os minutos diários correspondentes a uma fatia do excesso
+        # Vamos tentar sugerir abater 30% do excesso só no aparelho vilão
+        meta_kwh_mensal = excesso_kwh * Decimal("0.30")
+        minutos_diarios_reducao = (meta_kwh_mensal * Decimal("60000")) / (vilao["potencia"] * Decimal("30"))
+        
+        # Arredondar para ficar simpático (ex: 12.4 min -> 10 min, 15 min)
+        minutos_arredondados = int(minutos_diarios_reducao / 5) * 5 
+        if minutos_arredondados == 0:
+            minutos_arredondados = 5
+
+        return f"- Reduza cerca de {minutos_arredondados} minutos por dia do uso do(a) {vilao['nome']}."
