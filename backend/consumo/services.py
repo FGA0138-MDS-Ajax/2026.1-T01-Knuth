@@ -34,28 +34,10 @@ class MotorCalculoEnergetico:
         quantidade_meses = Decimal(len(consumos_mensais_kwh))
         consumo_medio = soma_consumo / quantidade_meses
 
-        # RF05: Cálculo de estimativa e impacto
-        # Utilizando a tarifa padrão (a ser substituída por variação de bandeira no futuro)
-        tarifa_base = Decimal("0.85")
-        custo_medio = consumo_medio * tarifa_base
-
-        if consumo_medio < Decimal("150"):
-            status = "abaixo_da_media"
-            recomendacao = "Parabéns! Seu consumo está abaixo da média nacional. Continue com os bons hábitos de economia."
-        elif consumo_medio <= Decimal("250"):
-            status = "na_media"
-            recomendacao = "Seu consumo está dentro da média. Considere reduzir o tempo de banho ou desligar aparelhos em stand-by para economizar mais."
-        else:
-            status = "acima_da_media"
-            recomendacao = "Atenção: seu consumo está alto! Evite usar o chuveiro elétrico nos horários de pico e verifique a vedação da geladeira."
-
         return {
             "meses_analisados": len(consumos_mensais_kwh),
             "consumo_total_kwh": soma_consumo.quantize(Decimal("0.01")),
             "consumo_medio_mensal_kwh": consumo_medio.quantize(Decimal("0.01")),
-            "custo_estimado_reais": custo_medio.quantize(Decimal("0.01")),
-            "status_consumo": status,
-            "recomendacao": recomendacao,
         }
     
     @staticmethod
