@@ -245,32 +245,34 @@ def analise_consumo_rf05(request):
             consumo_real_kwh = dados.get("consumo_real_kwh")
             ids_eletrodomesticos = dados.get("eletrodomesticos_selecionados", [])
 
-            # Validação básica de segurança para garantir que não venha nada null ou zero para gerar numeros negativos
-            if not consumo_real_kwh or not ids_eletrodomesticos:
+            #vazio ou nulo
+            if consumo_real_kwh is None or not ids_eletrodomesticos:
                 return JsonResponse(
-                    {"erro": "Por favor, informe o consumo da sua conta de Luz em kWh e selcione o(s) aparelho(s) mais consumido(s)."},
-                    status=400
-                )
-            try:
-                if float(consumo_real_kwh) <= 0:
-                    return JsonResponse(
-                        {"erro:" "O valor da conta de luz deve ser maior que zero"},
-                        status = 400
-                    )
-            except ValueError:
-                return JsonResponse(
-                    {"erro:" "Por favor, digite apenas números válidos em kilo Watt hora (kWh)"},
+                    {"erro": "Por favor, informe o consumo real e selecione pelo menos um aparelho."},
                     status=400
                 )
 
-            # Chama o calculo feito no services.py
+            # se e negativo ou se escrito por extenso
+            if float(consumo_real_kwh) <= 0:
+                return JsonResponse(
+                    {"erro": "O valor da conta de luz deve ser maior que zero."},
+                    status=400
+                )
+
+            #se tudo certo, entre no calculo
             resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
                 consumo_real_kwh=consumo_real_kwh,
                 ids_eletrodomesticos=ids_eletrodomesticos
             )
 
-            
             return JsonResponse({"resultado": resultado}, status=200)
+
+        except ValueError:
+            #se não for numero real
+            return JsonResponse(
+                {"erro": "Por favor, digite apenas números válidos em kilo Watt hora (kWh)"},
+                status=400
+            )
 
         except json.JSONDecodeError:
             return JsonResponse({"erro": "Formato de JSON inválido enviado pelo Front-end."}, status=400)

@@ -103,7 +103,7 @@ class SimuladorRF05:
     @staticmethod
     def gerar_analise_e_recomendacoes(consumo_real_kwh, ids_eletrodomesticos):
         # buscar os aparelhos selecionados no banco de dados
-        aparelhos = Eletrodomestico.objects.filter(id__in=ids_eletrodomesticos)
+        aparelhos = Eletrodomestico.objects.filter(nome__in=ids_eletrodomesticos)
 
         consumo_estimado_mensal = Decimal("0.0")
         aparelhos_para_reduzir = []  # Lista para guardar aparelhos que podem ser otimizados
