@@ -1,6 +1,5 @@
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from .models import Eletrodomestico
-from .services import SimuladorRF05
 from django.test import TestCase
 class CalculoEnergeticoError(ValueError):
     pass
@@ -103,14 +102,17 @@ class MotorCalculoEnergetico:
 class SimuladorRF05:
     @staticmethod
     def gerar_analise_e_recomendacoes(consumo_real_kwh, ids_eletrodomesticos):
-        #buscar os aparelhos selecionados no banco de dados
+        # buscar os aparelhos selecionados no banco de dados
         aparelhos = Eletrodomestico.objects.filter(id__in=ids_eletrodomesticos)
-        
-        consumo_estimado_mensal = Decimal("0.0")
-        aparelhos_para_reduzir = [] # Lista para guardar aparelhos que podem ser otimizados
 
-        #verificar o ar-condicionado
-        tem_ar_condicionado = any(ap.id == 14 for ap in aparelho)
+        consumo_estimado_mensal = Decimal("0.0")
+        aparelhos_para_reduzir = []  # Lista para guardar aparelhos que podem ser otimizados
+
+        # verificar o ar-condicionado (Buscando dinamicamente por texto no nome em vez de ID fixo)
+        tem_ar_condicionado = any(
+            "ar-condicionado" in ap.nome.lower() or "ar condicionado" in ap.nome.lower()
+            for ap in aparelhos
+        )
         if tem_ar_condicionado:
             limite_ideal = Decimal("350")
             limite_media = Decimal("450")
@@ -118,16 +120,23 @@ class SimuladorRF05:
             limite_ideal = Decimal("180")
             limite_media = Decimal("210")
 
-
         # Calcular o consumo estimado de todos os aparelhos juntos
         for aparelho in aparelhos:
             # Fórmula: (Watts * Minutos * 30 dias) / 60000
-            #ignorem #kwh_mensal = (Decimal(aparelho.potencia_media_watts) * Decimal(aparelho.tempo_medio_uso_minutos) * Decimal("30")) / Decimal("60000")
-            #ignorem #consumo_estimado_mensal += kwh_mensal
-            
-            # Regra de negocios: Blindar a Geladeira/Refrigerador (IDs 1 e 2) e Roteador (ID 22)
-            if aparelho.id not in [1, 2, 22]:
-                kwh_mensal = (Decimal(aparelho.potencia_media_watts) * Decimal(aparelho.tempo_medio_uso_minutos) * Decimal("30")) / Decimal("60000")
+            # ignorem #kwh_mensal = (Decimal(aparelho.potencia_media_watts) * Decimal(aparelho.tempo_medio_uso_minutos) * Decimal("30")) / Decimal("60000")
+            # ignorem #consumo_estimado_mensal += kwh_mensal
+
+            # Regra de negocios: Blindar a Geladeira/Refrigerador e Roteador buscando dinamicamente por texto no nome
+            nome_minusculo = aparelho.nome.lower()
+            e_blindado = (
+                    "geladeira" in nome_minusculo or
+                    "refrigerador" in nome_minusculo or
+                    "roteador" in nome_minusculo
+            )
+
+            if not e_blindado:
+                kwh_mensal = (Decimal(aparelho.potencia_media_watts) * Decimal(
+                    aparelho.tempo_medio_uso_minutos) * Decimal("30")) / Decimal("60000")
                 aparelhos_para_reduzir.append({
                     "nome": aparelho.nome,
                     "potencia": Decimal(aparelho.potencia_media_watts),
@@ -141,19 +150,17 @@ class SimuladorRF05:
                 "status_consumo": "dentro_do_ideal",
                 "recomendacao": "Excelente! O seu consumo real está compatível (ou menor) que a estimativa dos seus aparelhos ideal para o Distrito Federal. Continue assim!"
             }
-        
+
         elif consumo_real_dec <= limite_media:
-            excesso_kwh = consumo_real_dec - limite_ideal ##se nn esta achar o excesso
+            excesso_kwh = consumo_real_dec - limite_ideal  ##se nn esta achar o excesso
             dicas = SimuladorRF05._calcular_metas_de_reducao(excesso_kwh, aparelhos_para_reduzir)
             return {
                 "status_consumo": "na_media",
                 "recomendacao": f"Você está na média do DF, mas pode melhorar! Para atingir o nível ideal, você precisa reduzir cerca de {excesso_kwh:.0f} kWh.\n\nTente isto:\n" + dicas
             }
-            
         else:
-            excesso_kwh = consumo_real_dec - limite_ideal ##se nn esta achar o excesso
+            excesso_kwh = consumo_real_dec - limite_ideal  ##se nn esta achar o excesso
             dicas = SimuladorRF05._calcular_metas_de_reducao(excesso_kwh, aparelhos_para_reduzir)
-            
             return {
                 "status_consumo": "acima_do_ideal",
                 "recomendacao": f"Notamos um excesso de aproximadamente {excesso_kwh:.0f} kWh. Para equilibrar sua conta, tente as seguintes metas diárias:\n" + dicas

@@ -81,15 +81,18 @@ def criar_simulacao_view(request):
             consumos_mensais_kwh=consumos
         )
 
+        # Usamos .get() com valores padrão seguros para evitar o KeyError de vez
         simulacao = SimulacaoConsumo.objects.create(
             usuario=request.user,
             titulo=titulo,
-            meses_analisados=resultado["meses_analisados"],
-            total_consumo_mensal_kwh=resultado["consumo_total_kwh"],
-            consumo_medio_mensal_kwh=resultado["consumo_medio_mensal_kwh"],
-            custo_estimado_reais=resultado["custo_estimado_reais"],
-            status_consumo=resultado["status_consumo"],
-            recomendacao=resultado["recomendacao"],
+            meses_analisados=resultado.get("meses_analisados", len(consumos) if consumos else 0),
+            total_consumo_mensal_kwh=resultado.get("consumo_total_kwh", Decimal("0.00")),
+            consumo_medio_mensal_kwh=resultado.get("consumo_medio_mensal_kwh", Decimal("0.00")),
+
+            # Campos que não vêm da média mensal ganham um valor padrão seguro:
+            custo_estimado_reais=resultado.get("custo_estimado_reais", Decimal("0.00")),
+            status_consumo=resultado.get("status_consumo", "nao_avaliado"),
+            recomendacao=resultado.get("recomendacao", "Simulação de média gerada com sucesso."),
         )
 
         return JsonResponse(
