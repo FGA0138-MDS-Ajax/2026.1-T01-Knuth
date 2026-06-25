@@ -322,7 +322,7 @@ class RF05SimuladorTests(TestCase):
     def test_sem_ar_dentro_do_ideal(self):
         resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
             consumo_real_kwh=180, 
-            ids_eletrodomesticos=[self.geladeira.id, self.chuveiro.id]
+            ids_eletrodomesticos=[self.geladeira.nome, self.chuveiro.nome]
         )
         self.assertEqual(resultado["status_consumo"], "dentro_do_ideal")
         self.assertIn("Excelente", resultado["recomendacao"])
@@ -330,7 +330,7 @@ class RF05SimuladorTests(TestCase):
     def test_sem_ar_na_media(self):
         resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
             consumo_real_kwh=210, 
-            ids_eletrodomesticos=[self.geladeira.id, self.chuveiro.id]
+            ids_eletrodomesticos=[self.geladeira.nome, self.chuveiro.nome]
         )
         self.assertEqual(resultado["status_consumo"], "na_media")
         self.assertIn("Você está na média do DF", resultado["recomendacao"])
@@ -338,7 +338,7 @@ class RF05SimuladorTests(TestCase):
     def test_sem_ar_acima_do_ideal(self):
         resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
             consumo_real_kwh=211, 
-            ids_eletrodomesticos=[self.geladeira.id, self.chuveiro.id]
+            ids_eletrodomesticos=[self.geladeira.nome, self.chuveiro.nome]
         )
         self.assertEqual(resultado["status_consumo"], "acima_do_ideal")
         self.assertIn("Chuveiro Elétrico", resultado["recomendacao"])
@@ -351,21 +351,21 @@ class RF05SimuladorTests(TestCase):
     def test_com_ar_dentro_do_ideal(self):
         resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
             consumo_real_kwh=350, 
-            ids_eletrodomesticos=[self.geladeira.id, self.ar_condicionado.id]
+            ids_eletrodomesticos=[self.geladeira.nome, self.ar_condicionado.nome]
         )
         self.assertEqual(resultado["status_consumo"], "dentro_do_ideal")
 
     def test_com_ar_na_media(self):
         resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
             consumo_real_kwh=450, 
-            ids_eletrodomesticos=[self.geladeira.id, self.chuveiro.id, self.ar_condicionado.id]
+            ids_eletrodomesticos=[self.geladeira.nome, self.chuveiro.nome, self.ar_condicionado.nome]
         )
         self.assertEqual(resultado["status_consumo"], "na_media")
 
     def test_com_ar_acima_do_ideal(self):
         resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
             consumo_real_kwh=451, 
-            ids_eletrodomesticos=[self.geladeira.id, self.chuveiro.id, self.ar_condicionado.id]
+            ids_eletrodomesticos=[self.geladeira.nome, self.chuveiro.nome, self.ar_condicionado.nome]
         )
         self.assertEqual(resultado["status_consumo"], "acima_do_ideal")
         # O chuveiro ainda deve ser apontado como o maior vilão
@@ -378,7 +378,7 @@ class RF05SimuladorTests(TestCase):
     def test_geladeira_nunca_e_recomendada_para_desligar(self):
         resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
             consumo_real_kwh=250, 
-            ids_eletrodomesticos=[self.geladeira.id]
+            ids_eletrodomesticos=[self.geladeira.nome]
         )
         self.assertEqual(resultado["status_consumo"], "acima_do_ideal")
         self.assertNotIn("Geladeira", resultado["recomendacao"])
