@@ -17,28 +17,20 @@ export default function AnaliseConsumo() {
     setCarregandoAparelhos(true);
     setErro('');
 
-    const exemplosFallback = [
-      { nome: 'Geladeira' },
-      { nome: 'Chuveiro Elétrico' },
-      { nome: 'Ar Condicionado' },
-      { nome: 'Televisão' },
-      { nome: 'Computador' },
-    ];
-
     fetch(apiUrl('/api/consumo/eletrodomesticos/'), { credentials: 'include' })
       .then((r) => r.json())
       .then((data) => {
         if (!ativo) return;
         if (data.ok) setAparelhos(data.eletrodomesticos || []);
         else {
-          setErro((data.erro || 'Falha ao carregar aparelhos.') + ' Usando lista de exemplo.');
-          setAparelhos(exemplosFallback);
+          setErro(data.erro || 'Falha ao carregar aparelhos.');
+          setAparelhos([]);
         }
       })
       .catch(() => {
         if (!ativo) return;
-        setErro('Falha de conexão ao carregar aparelhos. Usando lista de exemplo.');
-        setAparelhos(exemplosFallback);
+        setErro('Falha de conexão ao carregar aparelhos.');
+        setAparelhos([]);
       })
       .finally(() => {
         if (!ativo) return;
@@ -114,6 +106,31 @@ export default function AnaliseConsumo() {
               </div>
             </div>
 
+            {selecionados.length > 0 && (
+              <div className="rounded-xl border border-slate-200 bg-white p-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <h3 className="text-sm font-medium text-slate-700 mb-3">Estimativa de Uso por Aparelho Selecionado</h3>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                   {selecionados.map(nome => {
+                     const ap = aparelhos.find(a => a.nome === nome);
+                     if (!ap) return null;
+                     return (
+                       <div key={ap.nome} className="rounded-lg border border-slate-100 bg-slate-50 p-3 shadow-sm hover:shadow-md transition-shadow">
+                         <p className="font-semibold text-slate-800 text-sm truncate" title={ap.nome}>{ap.nome}</p>
+                         <div className="mt-2 flex justify-between items-center text-xs">
+                           <span className="text-slate-500">Consumo base:</span>
+                           <span className="font-medium text-slate-700">{ap.consumo_estimado_kwh || '0'} kWh</span>
+                         </div>
+                         <div className="mt-1 flex justify-between items-center text-xs">
+                           <span className="text-slate-500">Custo base:</span>
+                           <span className="font-medium text-emerald-600">R$ {ap.custo_estimado_reais || '0.00'}</span>
+                         </div>
+                       </div>
+                     );
+                   })}
+                </div>
+              </div>
+            )}
+
             <div>
               <button
                 onClick={async () => {
@@ -147,12 +164,23 @@ export default function AnaliseConsumo() {
               >
                 {enviando ? 'Analisando...' : 'Analisar consumo'}
               </button>
-              <p className="mt-2 text-xs text-slate-400">Botão desabilitado: integração com backend na próxima etapa.</p>
             </div>
             {resultado && (
-              <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-                <p className="text-sm font-semibold text-slate-700">Status: {resultado.status_consumo}</p>
-                <p className="mt-2 text-sm text-slate-800 whitespace-pre-line">{resultado.recomendacao}</p>
+              <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-5 shadow-sm">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase ${
+                      resultado.status_consumo === 'dentro_do_ideal' ? 'bg-emerald-200 text-emerald-800' :
+                      resultado.status_consumo === 'na_media' ? 'bg-yellow-200 text-yellow-800' :
+                      'bg-red-200 text-red-800'
+                    }`}>
+                      {resultado.status_consumo.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-700 whitespace-pre-line leading-relaxed">
+                    {resultado.recomendacao}
+                  </p>
+                </div>
               </div>
             )}
             {erro && (
