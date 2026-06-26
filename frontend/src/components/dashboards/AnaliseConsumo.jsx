@@ -1,17 +1,54 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '../common/Navbar';
+import { apiUrl } from '../../config/api';
 
 export default function AnaliseConsumo() {
   const [consumo, setConsumo] = useState('');
   const [selecionados, setSelecionados] = useState([]);
 
-  const exemplos = [
-    'Geladeira',
-    'Chuveiro Elétrico',
-    'Ar Condicionado',
-    'Televisão',
-    'Computador',
-  ];
+  const [aparelhos, setAparelhos] = useState([]);
+  const [carregandoAparelhos, setCarregandoAparelhos] = useState(true);
+  const [erro, setErro] = useState('');
+  const [enviando, setEnviando] = useState(false);
+  const [resultado, setResultado] = useState(null);
+
+  useEffect(() => {
+    let ativo = true;
+    setCarregandoAparelhos(true);
+    setErro('');
+
+    const exemplosFallback = [
+      { nome: 'Geladeira' },
+      { nome: 'Chuveiro Elétrico' },
+      { nome: 'Ar Condicionado' },
+      { nome: 'Televisão' },
+      { nome: 'Computador' },
+    ];
+
+    fetch(apiUrl('/api/consumo/eletrodomesticos/'), { credentials: 'include' })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!ativo) return;
+        if (data.ok) setAparelhos(data.eletrodomesticos || []);
+        else {
+          setErro((data.erro || 'Falha ao carregar aparelhos.') + ' Usando lista de exemplo.');
+          setAparelhos(exemplosFallback);
+        }
+      })
+      .catch(() => {
+        if (!ativo) return;
+        setErro('Falha de conexão ao carregar aparelhos. Usando lista de exemplo.');
+        setAparelhos(exemplosFallback);
+      })
+      .finally(() => {
+        if (!ativo) return;
+        setCarregandoAparelhos(false);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   const toggleSelecionado = (nome) => {
     setSelecionados((prev) =>
@@ -54,30 +91,73 @@ export default function AnaliseConsumo() {
               <div className="rounded-xl border border-slate-200 bg-white p-4">
                 <label className="block text-sm font-medium text-slate-700">Selecione aparelhos</label>
                 <div className="mt-3 grid gap-2">
-                  {exemplos.map((nome) => (
-                    <label key={nome} className="inline-flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={selecionados.includes(nome)}
-                        onChange={() => toggleSelecionado(nome)}
-                        className="h-4 w-4 rounded border-slate-200"
-                      />
-                      <span className="text-slate-700">{nome}</span>
-                    </label>
-                  ))}
+                  {carregandoAparelhos ? (
+                    <p className="text-sm text-slate-400">Carregando aparelhos...</p>
+                  ) : erro ? (
+                    <p className="text-sm text-red-600">{erro}</p>
+                  ) : aparelhos.length === 0 ? (
+                    <p className="text-sm text-slate-400">Nenhum aparelho disponível.</p>
+                  ) : (
+                    aparelhos.map((item) => (
+                      <label key={item.nome} className="inline-flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={selecionados.includes(item.nome)}
+                          onChange={() => toggleSelecionado(item.nome)}
+                          className="h-4 w-4 rounded border-slate-200"
+                        />
+                        <span className="text-slate-700">{item.nome}</span>
+                      </label>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
 
             <div>
               <button
-                disabled
+                onClick={async () => {
+                  setErro('');
+                  setResultado(null);
+                  setEnviando(true);
+                  try {
+                    const resp = await fetch(apiUrl('/api/consumo/analise-reducao/'), {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      credentials: 'include',
+                      body: JSON.stringify({
+                        consumo_real_kwh: Number(consumo),
+                        eletrodomesticos_selecionados: selecionados,
+                      }),
+                    });
+                    const data = await resp.json();
+                    if (resp.ok && data.resultado) {
+                      setResultado(data.resultado);
+                    } else {
+                      setErro(data.erro || 'Erro ao analisar consumo.');
+                    }
+                  } catch (e) {
+                    setErro('Falha de comunicação com o servidor.');
+                  } finally {
+                    setEnviando(false);
+                  }
+                }}
+                disabled={!(Number(consumo) > 0 && selecionados.length > 0) || enviando}
                 className="rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow disabled:opacity-60"
               >
-                Analisar consumo (em breve)
+                {enviando ? 'Analisando...' : 'Analisar consumo'}
               </button>
               <p className="mt-2 text-xs text-slate-400">Botão desabilitado: integração com backend na próxima etapa.</p>
             </div>
+            {resultado && (
+              <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+                <p className="text-sm font-semibold text-slate-700">Status: {resultado.status_consumo}</p>
+                <p className="mt-2 text-sm text-slate-800 whitespace-pre-line">{resultado.recomendacao}</p>
+              </div>
+            )}
+            {erro && (
+              <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">{erro}</div>
+            )}
           </div>
         </main>
       </div>
