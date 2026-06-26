@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import Navbar from '../common/Navbar';
 import { apiUrl } from '../../config/api';
 
@@ -11,6 +11,17 @@ export default function AnaliseConsumo() {
   const [erro, setErro] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [resultado, setResultado] = useState(null);
+  
+  const resultadoRef = useRef(null);
+
+  useEffect(() => {
+    if (resultado && resultadoRef.current) {
+      // Pequeno delay para garantir que a animação inicial do Tailwind não afete o cálculo de posição
+      setTimeout(() => {
+        resultadoRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [resultado]);
 
   useEffect(() => {
     let ativo = true;
@@ -189,7 +200,7 @@ export default function AnaliseConsumo() {
               </button>
             </div>
             {resultado && (
-              <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <div ref={resultadoRef} className="mt-6 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-5 shadow-sm">
                   <div className="flex items-center gap-2 mb-3">
                     <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase ${
