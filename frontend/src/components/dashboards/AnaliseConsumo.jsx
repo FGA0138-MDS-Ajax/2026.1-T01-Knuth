@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Navbar from '../common/Navbar';
 import { apiUrl } from '../../config/api';
 
@@ -47,6 +47,29 @@ export default function AnaliseConsumo() {
       prev.includes(nome) ? prev.filter((p) => p !== nome) : [...prev, nome]
     );
   };
+
+  const impactoFinanceiro = useMemo(() => {
+    if (!resultado || !resultado.recomendacao || !consumo) return null;
+    
+    let excesso = 0;
+    // Tenta extrair o número de kWh excedente da string da recomendação
+    const match1 = resultado.recomendacao.match(/reduzir cerca de (\d+(?:\.\d+)?) kWh/);
+    const match2 = resultado.recomendacao.match(/excesso de aproximadamente (\d+(?:\.\d+)?) kWh/);
+    
+    if (match1) excesso = Number(match1[1]);
+    if (match2) excesso = Number(match2[1]);
+
+    const tarifa = 0.85; // Tarifa base estipulada pela regra de negócio
+    const custoAtual = Number(consumo) * tarifa;
+    
+    if (excesso > 0) {
+      const economia = excesso * tarifa;
+      const custoFuturo = Math.max(0, custoAtual - economia);
+      return { excesso, economia, custoAtual, custoFuturo };
+    }
+    
+    return { excesso: 0, economia: 0, custoAtual, custoFuturo: custoAtual };
+  }, [resultado, consumo]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-cyan-50 text-slate-800">
@@ -181,6 +204,23 @@ export default function AnaliseConsumo() {
                     {resultado.recomendacao}
                   </p>
                 </div>
+
+                {impactoFinanceiro && (
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
+                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Custo Atual Estimado</p>
+                       <p className="mt-1 text-2xl font-black text-slate-700">R$ {impactoFinanceiro.custoAtual.toFixed(2)}</p>
+                    </div>
+                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center shadow-sm">
+                       <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Economia Possível</p>
+                       <p className="mt-1 text-2xl font-black text-emerald-600">- R$ {impactoFinanceiro.economia.toFixed(2)}</p>
+                    </div>
+                    <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-center shadow-sm">
+                       <p className="text-[10px] font-bold text-cyan-600 uppercase tracking-wider">Novo Custo Estimado</p>
+                       <p className="mt-1 text-2xl font-black text-cyan-600">R$ {impactoFinanceiro.custoFuturo.toFixed(2)}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             {erro && (
