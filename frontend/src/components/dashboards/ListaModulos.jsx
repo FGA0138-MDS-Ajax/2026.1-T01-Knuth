@@ -17,7 +17,10 @@ const modulosMock = [
 ];
 export default function ListaModulos() {
   const [modulos, setModulos] = useState(modulosMock);
-
+ 
+  const concluidos = modulos.filter(m => m.concluido).length;
+  const total = modulos.length;
+  const progresso = Math.round((concluidos / total) * 100);
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-emerald-50 via-white to-cyan-50 text-slate-800">
@@ -30,7 +33,20 @@ export default function ListaModulos() {
             Aprenda sobre energia limpa e descubra como atrelar sustentabilidade à economia na sua conta de luz.
           </p>
         </div>
-        
+     
+        <div className="bg-white/80 border border-emerald-100 rounded-2xl p-6 shadow-sm backdrop-blur-sm mb-8">
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="font-semibold text-slate-700">Seu Progresso</h2>
+            <span className="text-emerald-600 font-bold">{progresso}% concluído</span>
+          </div>
+          <div className="w-full bg-slate-100 rounded-full h-3">
+            <div className="bg-emerald-500 h-3 rounded-full transition-all duration-500" style={{ width: `${progresso}%` }}></div>
+          </div>
+          <p className="text-sm text-slate-400 mt-2">Você concluiu {concluidos} de {total} módulos.</p>
+        </div>
+  
+        //parte do conteudo
+
       </main>
     </div>
   );
