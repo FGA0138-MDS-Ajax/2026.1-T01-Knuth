@@ -1,31 +1,29 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import Navbar from '../common/Navbar';
 import { Link } from 'react-router-dom';
+import { modulos } from '../../data/modulos';
+import { getModulosConcluidos } from '../../config/progressoModulos';
 
- //depois que o backend fizer os dados reais , bast integrar. No caso, substitui pelos daos reais
-// foi criado um mock (dados fake) inicial para desenvolvimento do front.
-//o mock foi feito a partir do notion que a Angeline elaborou
-const modulosMock = [ 
-  { id: 1, titulo: "Entendendo sua conta de luz", descricao: "Você já olhou para a sua conta de luz e não entendeu nada do que estava escrito ali? Você não está sozinho", concluido: true, duracao: "5 min" },
-  { id: 2, titulo: "Os vilões do consumo", descricao: "Se a sua conta de luz está alta e você não sabe bem por quê, é provável que algum aparelho esteja consumindo bem mais do que você imagina.", concluido: false, duracao: "8 min" },
-  { id: 3, titulo: "Como economizar na prática", descricao: "Saber quais aparelhos consomem mais é o primeiro passo. O segundo é saber o que fazer com essa informação", concluido: false, duracao: "6 min" },
-  { id: 4, titulo: "Energia solar: o sol trabalhando por você", descricao: "Neste módulo, você vai entender como funciona a energia solar, se ela faz sentido para a sua realidade e o que o Brasil tem feito nessa área.", concluido: false, duracao: "7 min" },
-  { id: 5, titulo: "Outras fontes de energia renovável", descricao: "Neste módulo, você vai conhecer as principais fontes de energia renovável, como elas funcionam e qual o papel de cada uma na nossa vida cotidiana.", concluido: false, duracao: "5 min" },
-  { id: 6, titulo: "Sustentabilidade e impacto ambiental", descricao: "Neste módulo, você vai entender a relação entre energia, meio ambiente e sustentabilidade, e por que as escolhas que fazemos no dia a dia têm consequências muito além da nossa conta de luz.", concluido: false, duracao: "4 min" },
-  { id: 7, titulo: "Entendendo sua eficiência energética em números", descricao: "Neste módulo, vamos colocar tudo isso em perspectiva com números: como comparar o seu consumo com médias brasileiras, o que é um consumo alto ou baixo para uma família e como usar dados para tomar decisões melhores.", concluido: false, duracao: "10 min" },
-  { id: 8, titulo: "O futuro da energia e o papel de cada um de nós", descricao: "Neste módulo, vamos falar sobre tendências, o que está por vir e como cada pessoa pode ser protagonista da transição energética.", concluido: false, duracao: "6 min" }
-];
 export default function ListaModulos() {
-  const [modulos, setModulos] = useState(modulosMock);
- 
-  const concluidos = modulos.filter(m => m.concluido).length;
-  const total = modulos.length;
+  const concluidosIds = getModulosConcluidos();
+
+  const modulosComStatus = useMemo(
+    () =>
+      modulos.map((modulo) => ({
+        ...modulo,
+        concluido: concluidosIds.includes(modulo.id),
+      })),
+    [concluidosIds]
+  );
+
+  const concluidos = modulosComStatus.filter((m) => m.concluido).length;
+  const total = modulosComStatus.length;
   const progresso = Math.round((concluidos / total) * 100);
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-emerald-50 via-white to-cyan-50 text-slate-800">
       <Navbar />
-      
+
       <main className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8 relative z-10">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Módulos de Aprendizagem</h1>
@@ -33,46 +31,52 @@ export default function ListaModulos() {
             Aprenda sobre energia limpa e descubra como atrelar sustentabilidade à economia na sua conta de luz.
           </p>
         </div>
-     
+
         <div className="bg-white/80 border border-emerald-100 rounded-2xl p-6 shadow-sm backdrop-blur-sm mb-8">
           <div className="flex justify-between items-center mb-2">
             <h2 className="font-semibold text-slate-700">Seu Progresso</h2>
             <span className="text-emerald-600 font-bold">{progresso}% concluído</span>
           </div>
           <div className="w-full bg-slate-100 rounded-full h-3">
-            <div className="bg-emerald-500 h-3 rounded-full transition-all duration-500" style={{ width: `${progresso}%` }}></div>
+            <div
+              className="bg-emerald-500 h-3 rounded-full transition-all duration-500"
+              style={{ width: `${progresso}%` }}
+            />
           </div>
-          <p className="text-sm text-slate-400 mt-2">Você concluiu {concluidos} de {total} módulos.</p>
+          <p className="text-sm text-slate-400 mt-2">
+            Você concluiu {concluidos} de {total} módulos.
+          </p>
         </div>
-  
-        
-  
+
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {modulos.map((modulo) => (
-            <div key={modulo.id} className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col h-full">
-              
+          {modulosComStatus.map((modulo) => (
+            <div
+              key={modulo.id}
+              className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col h-full"
+            >
               <div className="flex justify-between items-start mb-3">
-                <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">Módulo {modulo.id}</span>
+                <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
+                  Módulo {modulo.id}
+                </span>
                 {modulo.concluido ? (
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full flex items-center gap-1">
-                    ✓ Concluído
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full">
+                    Concluído
                   </span>
                 ) : (
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-1 rounded-full flex items-center gap-1">
-                    ⏱ {modulo.duracao}
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
+                    {modulo.duracao}
                   </span>
                 )}
               </div>
-              
+
               <h3 className="font-bold text-slate-800 mb-2">{modulo.titulo}</h3>
               <p className="text-sm text-slate-500 mb-5 flex-1">{modulo.descricao}</p>
-              
-              {/* No futuro este Link levará para a tela de leitura de fato: to={`/modulo-educativo/${modulo.id}`} */}
-              <Link 
-                to="#" 
+
+              <Link
+                to={`/modulo-educativo/${modulo.id}`}
                 className={`text-center py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  modulo.concluido 
-                    ? 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100' 
+                  modulo.concluido
+                    ? 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
                     : 'bg-emerald-500 text-white hover:bg-emerald-600'
                 }`}
               >
@@ -81,7 +85,6 @@ export default function ListaModulos() {
             </div>
           ))}
         </div>
-
       </main>
     </div>
   );
