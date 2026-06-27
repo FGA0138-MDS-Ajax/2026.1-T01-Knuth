@@ -106,7 +106,8 @@ export default function AnaliseConsumo() {
                 <label className="block text-sm font-medium text-slate-700">Consumo real (kWh)</label>
                 <input
                   type="number"
-                  min="1"
+                  min="10"
+                  max="999"
                   className="mt-2 w-full rounded-md border border-slate-200 px-3 py-2 outline-none focus:border-emerald-400"
                   placeholder="Ex.: 250"
                   value={consumo}
