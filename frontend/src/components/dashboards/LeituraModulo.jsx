@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../common/Navbar';
-import { getModuloById, getProximoModulo } from '../../data/modulos';
+import { getModuloById, getModuloAnterior, getProximoModulo } from '../../data/modulos';
 import { marcarModuloConcluido, moduloEstaConcluido } from '../../config/progressoModulos';
 import { BlocoConteudo, QuizModulo, renderTextoComNegrito } from './ConteudoModulo';
 
@@ -10,11 +10,16 @@ export default function LeituraModulo() {
   const navigate = useNavigate();
   const modulo = getModuloById(id);
   const proximoModulo = getProximoModulo(id);
+  const moduloAnterior = getModuloAnterior(id);
   const [concluido, setConcluido] = useState(() => moduloEstaConcluido(id));
 
   useEffect(() => {
     setConcluido(moduloEstaConcluido(id));
   }, [id]);
+
+  // ── Guarda de acesso: módulo bloqueado ──────────────────────────────────────
+  // O módulo 1 nunca é bloqueado. Os demais requerem que o anterior esteja concluído.
+  const bloqueado = moduloAnterior !== null && !moduloEstaConcluido(moduloAnterior.id);
 
   if (!modulo) {
     return (
@@ -29,6 +34,44 @@ export default function LeituraModulo() {
       </div>
     );
   }
+
+  // Tela de bloqueio — exibida se o módulo anterior não foi concluído
+  if (bloqueado) {
+    return (
+      <div className="relative min-h-screen bg-gradient-to-br from-emerald-50 via-white to-cyan-50 text-slate-800">
+        <Navbar />
+        <main className="max-w-xl mx-auto px-4 py-24 text-center">
+          <div className="bg-white/80 border border-slate-200 rounded-2xl p-10 shadow-sm backdrop-blur-sm">
+            <div className="text-5xl mb-6">🔒</div>
+            <h1 className="text-2xl font-bold text-slate-900 mb-3">Módulo bloqueado</h1>
+            <p className="text-slate-500 mb-2">
+              Você precisa concluir o <strong className="text-slate-700">Módulo {moduloAnterior.id}</strong> antes de
+              acessar este.
+            </p>
+            <p className="text-sm text-slate-400 mb-8">
+              Complete os módulos em ordem para avançar na trilha de aprendizagem.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                to={`/modulo-educativo/${moduloAnterior.id}`}
+                className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-gradient-to-r from-emerald-500 to-cyan-500 text-white hover:from-emerald-600 hover:to-cyan-600 shadow-sm transition-all"
+              >
+                Ir para o Módulo {moduloAnterior.id}
+              </Link>
+              <Link
+                to="/ListaModulos"
+                className="px-5 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors"
+              >
+                Ver todos os módulos
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ── Leitura normal ──────────────────────────────────────────────────────────
 
   function handleMarcarConcluido() {
     marcarModuloConcluido(modulo.id);
@@ -127,7 +170,7 @@ export default function LeituraModulo() {
             ) : (
               <>
                 <span className="px-4 py-2 text-sm font-semibold text-emerald-700">
-                  Módulo concluído
+                  Módulo concluído ✓
                 </span>
                 {proximoModulo ? (
                   <button

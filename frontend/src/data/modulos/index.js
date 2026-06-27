@@ -17,3 +17,8 @@ export function getProximoModulo(id) {
   const indice = modulos.findIndex((m) => m.id === Number(id));
   return indice >= 0 && indice < modulos.length - 1 ? modulos[indice + 1] : null;
 }
+
+export function getModuloAnterior(id) {
+  const indice = modulos.findIndex((m) => m.id === Number(id));
+  return indice > 0 ? modulos[indice - 1] : null;
+}

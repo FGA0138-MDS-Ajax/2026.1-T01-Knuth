@@ -17,9 +17,11 @@ export default function ListaModulos() {
 
   const modulosComStatus = useMemo(
     () =>
-      modulos.map((modulo) => ({
+      modulos.map((modulo, index) => ({
         ...modulo,
         concluido: concluidosIds.includes(modulo.id),
+        // Bloqueado se não for o primeiro E o anterior não estiver concluído
+        bloqueado: index > 0 && !concluidosIds.includes(modulos[index - 1].id),
       })),
     [concluidosIds]
   );
@@ -60,15 +62,24 @@ export default function ListaModulos() {
           {modulosComStatus.map((modulo) => (
             <div
               key={modulo.id}
-              className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col h-full"
+              className={`bg-white border rounded-xl p-5 flex flex-col h-full transition-shadow ${
+                modulo.bloqueado
+                  ? 'border-slate-100 opacity-60 cursor-not-allowed'
+                  : 'border-slate-200 hover:shadow-md'
+              }`}
             >
               <div className="flex justify-between items-start mb-3">
                 <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
                   Módulo {modulo.id}
                 </span>
-                {modulo.concluido ? (
+
+                {modulo.bloqueado ? (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-1 rounded-full flex items-center gap-1">
+                    🔒 Bloqueado
+                  </span>
+                ) : modulo.concluido ? (
                   <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full">
-                    Concluído
+                    ✓ Concluído
                   </span>
                 ) : (
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
@@ -80,16 +91,22 @@ export default function ListaModulos() {
               <h3 className="font-bold text-slate-800 mb-2">{modulo.titulo}</h3>
               <p className="text-sm text-slate-500 mb-5 flex-1">{modulo.descricao}</p>
 
-              <Link
-                to={`/modulo-educativo/${modulo.id}`}
-                className={`text-center py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  modulo.concluido
-                    ? 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
-                    : 'bg-emerald-500 text-white hover:bg-emerald-600'
-                }`}
-              >
-                {modulo.concluido ? 'Ler Novamente' : 'Começar Leitura'}
-              </Link>
+              {modulo.bloqueado ? (
+                <div className="text-center py-2 rounded-lg text-sm font-semibold bg-slate-50 text-slate-400 border border-slate-200 select-none">
+                  Conclua o módulo anterior
+                </div>
+              ) : (
+                <Link
+                  to={`/modulo-educativo/${modulo.id}`}
+                  className={`text-center py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    modulo.concluido
+                      ? 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
+                      : 'bg-emerald-500 text-white hover:bg-emerald-600'
+                  }`}
+                >
+                  {modulo.concluido ? 'Ler Novamente' : 'Começar Leitura'}
+                </Link>
+              )}
             </div>
           ))}
         </div>
