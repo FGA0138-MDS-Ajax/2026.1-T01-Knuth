@@ -1,11 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Navbar from '../common/Navbar';
 import { Link } from 'react-router-dom';
 import { modulos } from '../../data/modulos';
-import { getModulosConcluidos } from '../../config/progressoModulos';
+import { getModulosConcluidos, sincronizarProgressoDoServidor } from '../../config/progressoModulos';
 
 export default function ListaModulos() {
-  const concluidosIds = getModulosConcluidos();
+  // Estado dos IDs concluídos — inicializa com o cache local (sem latência)
+  const [concluidosIds, setConcluidosIds] = useState(() => getModulosConcluidos());
+
+  // Ao montar: sincroniza com o servidor e atualiza o estado se necessário
+  useEffect(() => {
+    sincronizarProgressoDoServidor().then((ids) => {
+      setConcluidosIds(ids);
+    });
+  }, []);
 
   const modulosComStatus = useMemo(
     () =>

@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('usuarios.urls')), # RF01 - Login e cadastro
     path('api/consumo/', include('consumo.urls')), # RF02 - consumo médio
+    path('api/educacao/', include('educacao.urls')), # RF06 - Módulos educativos
 ]
