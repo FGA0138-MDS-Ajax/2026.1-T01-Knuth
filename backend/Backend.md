@@ -162,6 +162,8 @@ Se você for pegar este projeto do zero, faça exatamente isto:
 ```powershell
 cd "C:\Seu computador\backend"
 .\.venv\Scripts\Activate.ps1
+#ou#
+source .venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver 8000
