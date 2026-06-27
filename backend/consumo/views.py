@@ -182,6 +182,7 @@ def normalizar_texto(texto): #função para normalizar o texto de busca, removen
 def listar_eletrodomesticos(request):
     # Lê o parâmetro "busca" — mesmo nome que o frontend envia
     busca = request.GET.get("busca", "").strip()
+    todos_param = request.GET.get("todos", "false").lower() == "true"
 
     if busca:
         # Busca em todo o catálogo com normalização de acentos/case
@@ -201,6 +202,8 @@ def listar_eletrodomesticos(request):
                 },
                 status=200,
             )
+    elif todos_param:
+        eletrodomesticos = list(Eletrodomestico.objects.all())
     else:
         # Sem busca: exibe apenas os destaques (Top 10 da tela inicial)
         eletrodomesticos = list(Eletrodomestico.objects.filter(destaque=True)[:10])

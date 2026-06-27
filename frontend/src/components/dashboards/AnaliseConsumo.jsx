@@ -28,7 +28,7 @@ export default function AnaliseConsumo() {
     setCarregandoAparelhos(true);
     setErro('');
 
-    fetch(apiUrl('/api/consumo/eletrodomesticos/'), { credentials: 'include' })
+    fetch(apiUrl('/api/consumo/eletrodomesticos/?todos=true'), { credentials: 'include' })
       .then((r) => r.json())
       .then((data) => {
         if (!ativo) return;
