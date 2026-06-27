@@ -39,7 +39,7 @@ function Navbar() {
               <Link to="/consumo-medio" className="text-slate-600 hover:bg-emerald-50 px-3 py-2 rounded-lg text-sm font-medium">Nova Simulação</Link>
               <Link to="/eletrodomesticos" className="text-slate-600 hover:bg-emerald-50 px-3 py-2 rounded-lg text-sm font-medium">Eletrodomésticos</Link>
               <Link to="/rf05" className="text-slate-600 hover:bg-emerald-50 px-3 py-2 rounded-lg text-sm font-medium">Análise de Consumo</Link>
-              <Link to="/modulo-educativo" className= "text-slate-600 hover:bg-emerald-50 px-3 py-2 rounded-lg text-sm font-medium">Aprendizagem</Link>
+              <Link to="/ListaModulos" className= "text-slate-600 hover:bg-emerald-50 px-3 py-2 rounded-lg text-sm font-medium">Aprendizagem</Link>
             </div>
           </div>
 
@@ -70,7 +70,7 @@ function Navbar() {
           <Link to="/consumo-medio" className="block text-slate-600 py-2">Nova Simulação</Link>
           <Link to="/eletrodomesticos" className="block text-slate-600 py-2">Eletrodomésticos</Link>
           <Link to="/rf05" className="block text-slate-600 py-2">Análise de Consumo</Link>
-          <Link to="/modulo-educativo" className="block text-slate-600 py-2">Aprendizagem</Link>
+          <Link to="/ListaModulos" className="block text-slate-600 py-2">Aprendizagem</Link>
         </div>
       )}
     </nav>

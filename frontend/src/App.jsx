@@ -8,6 +8,8 @@ import AnaliseConsumo from './components/dashboards/AnaliseConsumo'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { estaLogado } from './config/auth'
+import ListaModulos from './components/dashboards/ListaModulos'
+
 
 export default function App() {
   return (
@@ -47,6 +49,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <AnaliseConsumo />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ListaModulos"
+        element={
+          <ProtectedRoute>
+            <ListaModulos />
           </ProtectedRoute>
         }
       />
