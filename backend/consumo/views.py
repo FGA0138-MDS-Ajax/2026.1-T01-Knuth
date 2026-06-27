@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .models import SimulacaoConsumo, Eletrodomestico
-from .services import MotorCalculoEnergetico, CalculoEnergeticoError
+from .services import MotorCalculoEnergetico, CalculoEnergeticoError, SimuladorRF05
 
 logger = logging.getLogger(__name__)
 
@@ -81,12 +81,18 @@ def criar_simulacao_view(request):
             consumos_mensais_kwh=consumos
         )
 
+        # Usamos .get() com valores padrão seguros para evitar o KeyError de vez
         simulacao = SimulacaoConsumo.objects.create(
             usuario=request.user,
             titulo=titulo,
-            meses_analisados=resultado["meses_analisados"],
-            total_consumo_mensal_kwh=resultado["consumo_total_kwh"],
-            consumo_medio_mensal_kwh=resultado["consumo_medio_mensal_kwh"],
+            meses_analisados=resultado.get("meses_analisados", len(consumos) if consumos else 0),
+            total_consumo_mensal_kwh=resultado.get("consumo_total_kwh", Decimal("0.00")),
+            consumo_medio_mensal_kwh=resultado.get("consumo_medio_mensal_kwh", Decimal("0.00")),
+
+            # Campos que não vêm da média mensal ganham um valor padrão seguro:
+            custo_estimado_reais=resultado.get("custo_estimado_reais", Decimal("0.00")),
+            status_consumo=resultado.get("status_consumo", "nao_avaliado"),
+            recomendacao=resultado.get("recomendacao", "Simulação de média gerada com sucesso."),
         )
 
         return JsonResponse(
@@ -141,6 +147,9 @@ def listar_minhas_simulacoes(request):
                 "meses_analisados": simulacao.meses_analisados,
                 "total_consumo_mensal_kwh": str(simulacao.total_consumo_mensal_kwh),
                 "consumo_medio_mensal_kwh": str(simulacao.consumo_medio_mensal_kwh),
+                "custo_estimado_reais": str(simulacao.custo_estimado_reais),
+                "status_consumo": simulacao.status_consumo,
+                "recomendacao": simulacao.recomendacao,
                 "criado_em": simulacao.criado_em.isoformat(),
             }
         )
@@ -227,3 +236,49 @@ def listar_eletrodomesticos(request):
         },
         status=200,
     )
+
+@csrf_exempt 
+def analise_consumo_rf05(request):
+    if request.method == 'POST': ##enviar
+        try:
+            dados = json.loads(request.body)
+            consumo_real_kwh = dados.get("consumo_real_kwh")
+            ids_eletrodomesticos = dados.get("eletrodomesticos_selecionados", [])
+
+            #vazio ou nulo
+            if consumo_real_kwh is None or not ids_eletrodomesticos:
+                return JsonResponse(
+                    {"erro": "Por favor, informe o consumo real e selecione pelo menos um aparelho."},
+                    status=400
+                )
+
+            # se e negativo ou se escrito por extenso
+            if float(consumo_real_kwh) <= 0:
+                return JsonResponse(
+                    {"erro": "O valor da conta de luz deve ser maior que zero."},
+                    status=400
+                )
+
+            #se tudo certo, entre no calculo
+            resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
+                consumo_real_kwh=consumo_real_kwh,
+                ids_eletrodomesticos=ids_eletrodomesticos
+            )
+
+            return JsonResponse({"resultado": resultado}, status=200)
+
+        except ValueError:
+            #se não for numero real
+            return JsonResponse(
+                {"erro": "Por favor, digite apenas números válidos em kilo Watt hora (kWh)"},
+                status=400
+            )
+
+        except json.JSONDecodeError:
+            return JsonResponse({"erro": "Formato de JSON inválido enviado pelo Front-end."}, status=400)
+        except Exception as e:
+            return JsonResponse({"erro": str(e)}, status=500)
+            
+    # Se alguém tentar acessar a rota direto pelo navegador (que é um GET), retorna erro
+    return JsonResponse({"erro": "Método não permitido."}, status=405)
+

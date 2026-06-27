@@ -38,6 +38,7 @@ function Navbar() {
               <Link to="/home" className="text-slate-600 hover:bg-emerald-50 px-3 py-2 rounded-lg text-sm font-medium">Dashboard</Link>
               <Link to="/consumo-medio" className="text-slate-600 hover:bg-emerald-50 px-3 py-2 rounded-lg text-sm font-medium">Nova Simulação</Link>
               <Link to="/eletrodomesticos" className="text-slate-600 hover:bg-emerald-50 px-3 py-2 rounded-lg text-sm font-medium">Eletrodomésticos</Link>
+              <Link to="/rf05" className="text-slate-600 hover:bg-emerald-50 px-3 py-2 rounded-lg text-sm font-medium">Análise de Consumo</Link>
             </div>
           </div>
 
@@ -67,6 +68,7 @@ function Navbar() {
           <Link to="/home" className="block text-slate-600 py-2">Dashboard</Link>
           <Link to="/consumo-medio" className="block text-slate-600 py-2">Nova Simulação</Link>
           <Link to="/eletrodomesticos" className="block text-slate-600 py-2">Eletrodomésticos</Link>
+          <Link to="/rf05" className="block text-slate-600 py-2">Análise de Consumo</Link>
         </div>
       )}
     </nav>

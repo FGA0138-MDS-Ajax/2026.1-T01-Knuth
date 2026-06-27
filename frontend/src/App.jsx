@@ -4,6 +4,7 @@ import RegisterScreen from './components/auth/RegisterScreen'
 import HomeScreen from './components/home/HomeScreen'
 import PaginaConsumoMedio from './components/dashboards/PaginaConsumoMedio'
 import PaginaEletrodomesticos from './components/dashboards/PaginaEletrodomesticos'
+import AnaliseConsumo from './components/dashboards/AnaliseConsumo'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { estaLogado } from './config/auth'
@@ -38,6 +39,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <PaginaEletrodomesticos />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/rf05"
+        element={
+          <ProtectedRoute>
+            <AnaliseConsumo />
           </ProtectedRoute>
         }
       />
