@@ -45,7 +45,42 @@ export default function ListaModulos() {
           <p className="text-sm text-slate-400 mt-2">Você concluiu {concluidos} de {total} módulos.</p>
         </div>
   
-        //parte do conteudo
+        
+  
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {modulos.map((modulo) => (
+            <div key={modulo.id} className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col h-full">
+              
+              <div className="flex justify-between items-start mb-3">
+                <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">Módulo {modulo.id}</span>
+                {modulo.concluido ? (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full flex items-center gap-1">
+                    ✓ Concluído
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-1 rounded-full flex items-center gap-1">
+                    ⏱ {modulo.duracao}
+                  </span>
+                )}
+              </div>
+              
+              <h3 className="font-bold text-slate-800 mb-2">{modulo.titulo}</h3>
+              <p className="text-sm text-slate-500 mb-5 flex-1">{modulo.descricao}</p>
+              
+              {/* No futuro este Link levará para a tela de leitura de fato: to={`/modulo-educativo/${modulo.id}`} */}
+              <Link 
+                to="#" 
+                className={`text-center py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  modulo.concluido 
+                    ? 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100' 
+                    : 'bg-emerald-500 text-white hover:bg-emerald-600'
+                }`}
+              >
+                {modulo.concluido ? 'Ler Novamente' : 'Começar Leitura'}
+              </Link>
+            </div>
+          ))}
+        </div>
 
       </main>
     </div>
