@@ -33,5 +33,11 @@ done
 echo "PostgreSQL pronto. Aplicando migrations..."
 python manage.py migrate
 
+echo "Carregando eletrodomésticos iniciais..."
+python manage.py loaddata eletrodomesticos_iniciais.json || true
+
+echo "Carregando módulos educativos..."
+python manage.py popular_modulos || true
+
 echo "Iniciando servidor Django..."
 exec python manage.py runserver 0.0.0.0:8000
