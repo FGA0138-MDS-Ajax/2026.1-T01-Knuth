@@ -54,6 +54,7 @@ export function QuizModulo({ perguntas }) {
   const [respostas, setRespostas] = React.useState({});
 
   function selecionarResposta(indicePergunta, indiceOpcao) {
+    if (respostas[indicePergunta] !== undefined) return;
     setRespostas((prev) => ({ ...prev, [indicePergunta]: indiceOpcao }));
   }
 
@@ -86,7 +87,8 @@ export function QuizModulo({ perguntas }) {
                     key={opcao.letra}
                     type="button"
                     onClick={() => selecionarResposta(indicePergunta, indiceOpcao)}
-                    className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${estilo}`}
+                    disabled={revelado}
+                    className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${estilo} ${revelado ? 'cursor-default' : 'cursor-pointer'}`}
                   >
                     <span className="font-medium">{opcao.letra})</span> {opcao.texto}
                     {revelado && selecionada && opcao.correta && (

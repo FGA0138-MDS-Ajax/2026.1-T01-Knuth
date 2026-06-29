@@ -133,7 +133,7 @@ export default function LeituraModulo() {
 
           <section className="mt-10 pt-6 border-t border-slate-200">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Quiz</h2>
-            <QuizModulo perguntas={modulo.quiz} />
+            <QuizModulo key={modulo.id} perguntas={modulo.quiz} />
           </section>
 
           {modulo.referencias?.length > 0 && (
