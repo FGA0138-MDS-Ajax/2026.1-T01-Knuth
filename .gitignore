@@ -21,3 +21,5 @@ __pycache__/
 *.pyc
 npm-debug.log*
 .DS_Store
+frontend/
+backend/
