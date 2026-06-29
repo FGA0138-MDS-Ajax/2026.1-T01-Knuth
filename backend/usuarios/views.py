@@ -135,15 +135,15 @@ def esqueci_senha(request):
 
     usuario = User.objects.filter(email__iexact=email, is_active=True).first()
     if usuario:
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = default_token_generator.make_token(user)
-        reset_link = f"/esqueceu-sua-senha/{uid}/{token}"
+        uid = urlsafe_base64_encode(force_bytes(usuario.pk))
+        token = default_token_generator.make_token(usuario)
+        reset_link = f"http://localhost:5173/esqueceu-sua-senha/{uid}/{token}" #url usado somente em fase de desenvolvimento
 
         send_mail(
-            titulo="Recuperação de senha - EducaEnergia",
-            mensagem=f"Clique no link para redefinir sua senha: {reset_link}",
+            subject="Recuperação de senha - EducaEnergia",
+            message=f"Clique no link para redefinir sua senha: {reset_link}",
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
+            recipient_list=[usuario.email],
             fail_silently=False,
         )
 
@@ -175,11 +175,6 @@ def reseta_senha(request):
 
     if usuario is None or not default_token_generator.check_token(usuario, token):
         return JsonResponse({"detail": "Link inválido ou expirado."}, status=400)
-
-    try:
-        validate_password(new_password, usuario=usuario)
-    except ValidationError as e:
-        return JsonResponse({"detail": list(e.messages)}, status=400)
 
     usuario.set_password(new_password)
     usuario.save()
