@@ -102,6 +102,14 @@ class MotorCalculoEnergetico:
 class SimuladorRF05:
     @staticmethod
     def gerar_analise_e_recomendacoes(consumo_real_kwh, ids_eletrodomesticos):
+        #inserção de limites no valor de kWh
+        try:
+            consumo_valido = int(consumo_real_kwh)
+        except (ValueError, TypeError):
+            raise ValueError("Consumo inválido. O valor deve ser um número inteiro.")
+        if consumo_valido < 10 or consumo_valido > 999:
+            raise ValueError("Consumo inválido. Insira um valor numérico entre 1 e 999 kWh.")
+
         # buscar os aparelhos selecionados no banco de dados
         aparelhos = Eletrodomestico.objects.filter(nome__in=ids_eletrodomesticos)
 

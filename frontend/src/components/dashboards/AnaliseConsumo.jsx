@@ -107,6 +107,7 @@ export default function AnaliseConsumo() {
                 <input
                   type="number"
                   min="1"
+                  max="999"
                   className="mt-2 w-full rounded-md border border-slate-200 px-3 py-2 outline-none focus:border-emerald-400"
                   placeholder="Ex.: 250"
                   value={consumo}
