@@ -28,7 +28,7 @@ export default function AnaliseConsumo() {
     setCarregandoAparelhos(true);
     setErro('');
 
-    fetch(apiUrl('/api/consumo/eletrodomesticos/'), { credentials: 'include' })
+    fetch(apiUrl('/api/consumo/eletrodomesticos/?todos=true'), { credentials: 'include' })
       .then((r) => r.json())
       .then((data) => {
         if (!ativo) return;
@@ -106,7 +106,7 @@ export default function AnaliseConsumo() {
                 <label className="block text-sm font-medium text-slate-700">Consumo real (kWh)</label>
                 <input
                   type="number"
-                  min="1"
+                  min="10"
                   max="999"
                   className="mt-2 w-full rounded-md border border-slate-200 px-3 py-2 outline-none focus:border-emerald-400"
                   placeholder="Ex.: 250"
@@ -115,9 +115,9 @@ export default function AnaliseConsumo() {
                 />
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white p-4">
-                <label className="block text-sm font-medium text-slate-700">Selecione aparelhos</label>
-                <div className="mt-3 grid gap-2">
+              <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-col max-h-[400px]">
+                <label className="block text-sm font-medium text-slate-700 mb-3">Selecione aparelhos</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto pr-2 flex-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-slate-300">
                   {carregandoAparelhos ? (
                     <p className="text-sm text-slate-400">Carregando aparelhos...</p>
                   ) : erro ? (
@@ -126,14 +126,21 @@ export default function AnaliseConsumo() {
                     <p className="text-sm text-slate-400">Nenhum aparelho disponível.</p>
                   ) : (
                     aparelhos.map((item) => (
-                      <label key={item.nome} className="inline-flex items-center gap-2 text-sm">
+                      <label 
+                        key={item.nome} 
+                        className={`flex items-center gap-3 rounded-lg border p-3 text-sm cursor-pointer transition-colors ${
+                          selecionados.includes(item.nome)
+                            ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-200 hover:bg-slate-50'
+                        }`}
+                      >
                         <input
                           type="checkbox"
                           checked={selecionados.includes(item.nome)}
                           onChange={() => toggleSelecionado(item.nome)}
-                          className="h-4 w-4 rounded border-slate-200"
+                          className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                         />
-                        <span className="text-slate-700">{item.nome}</span>
+                        <span className="truncate flex-1 font-medium">{item.nome}</span>
                       </label>
                     ))
                   )}
