@@ -271,9 +271,9 @@ def analise_consumo_rf05(request):
             return JsonResponse({"resultado": resultado}, status=200)
 
         except ValueError:
-            #se não for numero real
+            #se não for numero real ou ultrassapar ou ser minimo no kWh
             return JsonResponse(
-                {"erro": "Por favor, digite apenas números válidos em kilo Watt hora (kWh)"},
+                {"erro": "Consumo inválido. Por favor, digite apenas valores entre 1 e 999 kWh"},
                 status=400
             )
 

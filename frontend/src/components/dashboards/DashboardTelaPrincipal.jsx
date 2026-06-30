@@ -92,17 +92,25 @@ function DashboardTelaPrincipal() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Painel de Consumo</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Meu Painel de Consumo</h1>
           <p className="mt-1 text-slate-500">
             Acompanhe a média mensal de uso de energia das suas simulações.
           </p>
         </div>
-        <Link
+        <div className="flex flex-wrap gap-3">
+          <Link
+            to="/home"
+            className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+          >
+            ← Voltar à home
+          </Link>
+          <Link
           to="/consumo-medio"
           className="rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110"
-        >
-          + Nova Simulação
-        </Link>
+          >
+            + Nova Simulação
+          </Link>
+        </div>
       </div>
 
       {loading ? (

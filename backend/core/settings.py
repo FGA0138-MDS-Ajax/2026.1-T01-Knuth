@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'corsheaders', ##solunado um bug
     'usuarios',
     'consumo',
+    'educacao',
 ]
 
 MIDDLEWARE = [

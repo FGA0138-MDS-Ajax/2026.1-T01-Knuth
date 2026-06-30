@@ -2,12 +2,16 @@ import './App.css'
 import AuthScreen from './components/auth/AuthScreen'
 import RegisterScreen from './components/auth/RegisterScreen'
 import HomeScreen from './components/home/HomeScreen'
+import PainelScreen from './components/home/PainelScreen'
 import PaginaConsumoMedio from './components/dashboards/PaginaConsumoMedio'
 import PaginaEletrodomesticos from './components/dashboards/PaginaEletrodomesticos'
 import AnaliseConsumo from './components/dashboards/AnaliseConsumo'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { estaLogado } from './config/auth'
+import ListaModulos from './components/dashboards/ListaModulos'
+import LeituraModulo from './components/dashboards/LeituraModulo'
+
 
 export default function App() {
   return (
@@ -23,6 +27,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <HomeScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/painel"
+        element={
+          <ProtectedRoute>
+            <PainelScreen />
           </ProtectedRoute>
         }
       />
@@ -47,6 +59,22 @@ export default function App() {
         element={
           <ProtectedRoute>
             <AnaliseConsumo />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ListaModulos"
+        element={
+          <ProtectedRoute>
+            <ListaModulos />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/modulo-educativo/:id"
+        element={
+          <ProtectedRoute>
+            <LeituraModulo />
           </ProtectedRoute>
         }
       />
