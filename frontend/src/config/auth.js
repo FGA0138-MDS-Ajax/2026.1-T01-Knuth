@@ -3,6 +3,7 @@
 // apenas um indicador local para decidir o que mostrar e proteger rotas.
 
 import { limparProgressoLocal } from './progressoModulos'
+import { limparEmblemasLocais } from './emblemas'
 
 const CHAVE_USUARIO = 'user_name'
 
@@ -22,6 +23,7 @@ export function salvarSessao(nomeUsuario) {
 
 export function encerrarSessao() {
   localStorage.removeItem(CHAVE_USUARIO)
-  // Limpa o cache de progresso para não vazar para o próximo usuário
+  // Limpa o cache de progresso e de emblemas para não vazar para o próximo usuário
   limparProgressoLocal()
+  limparEmblemasLocais()
 }

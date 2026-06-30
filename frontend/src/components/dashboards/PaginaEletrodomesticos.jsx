@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { apiUrl } from '../../config/api';
 import Navbar from '../common/Navbar';
+import { desbloquearEmblema } from '../../config/emblemas';
 
 function CardEletrodomestico({ item, destaque }) {
   return (
@@ -77,6 +78,8 @@ export default function PaginaEletrodomesticos() {
         setEletrodomesticos(data.eletrodomesticos || []);
         setMensagemVazia(data.mensagem || '');
         setModoBusca(Boolean(termo.trim()));
+        // RF08 — consultou a página de Eletrodomésticos (visualizou ou buscou).
+        desbloquearEmblema('detetive_de_aparelhos');
       } else {
         setErro(data.erro || 'Não foi possível carregar os eletrodomésticos.');
         setEletrodomesticos([]);

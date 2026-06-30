@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { apiUrl } from '../../config/api';
 import { encerrarSessao, getNomeUsuario } from '../../config/auth';
 import EducaEnergiaLogo from '../auth/EducaEnergiaLogo';
+import MeusEmblemasModal from './MeusEmblemasModal';
+import EmblemaToast from './EmblemaToast';
 
 const containerNav = 'w-full px-5 sm:px-8 lg:px-12 xl:px-16';
 
@@ -42,13 +44,23 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuAberto, setMenuAberto] = useState(false);
+  const [menuUsuarioAberto, setMenuUsuarioAberto] = useState(false);
+  const [modalEmblemasAberto, setModalEmblemasAberto] = useState(false);
   const nomeUsuario = getNomeUsuario() || 'Visitante';
   const inicial = nomeUsuario.charAt(0).toUpperCase();
 
   const fecharMenu = () => setMenuAberto(false);
+  const fecharMenuUsuario = () => setMenuUsuarioAberto(false);
+
+  const abrirEmblemas = () => {
+    fecharMenu();
+    fecharMenuUsuario();
+    setModalEmblemasAberto(true);
+  };
 
   const sair = async () => {
     fecharMenu();
+    fecharMenuUsuario();
     try {
       await fetch(apiUrl('/api/logout/'), {
         method: 'POST',
@@ -95,22 +107,66 @@ function Navbar() {
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-4">
-          <div className="hidden md:flex items-center gap-3 pr-2 border-r border-slate-200">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
-              <span className="text-white font-semibold text-xs">{inicial}</span>
-            </div>
-            <span className="text-sm font-medium text-slate-700 max-w-[140px] truncate">
-              {nomeUsuario}
-            </span>
-          </div>
+          <div className="relative hidden md:block">
+            <button
+              type="button"
+              onClick={() => setMenuUsuarioAberto((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={menuUsuarioAberto}
+              className="flex items-center gap-3 rounded-full py-1 pl-1 pr-2.5 transition-colors hover:bg-emerald-50/80"
+            >
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
+                <span className="text-white font-semibold text-xs">{inicial}</span>
+              </div>
+              <span className="text-sm font-medium text-slate-700 max-w-[140px] truncate">
+                {nomeUsuario}
+              </span>
+              <span
+                className={`text-slate-400 text-[10px] transition-transform ${
+                  menuUsuarioAberto ? 'rotate-180' : ''
+                }`}
+                aria-hidden
+              >
+                ▼
+              </span>
+            </button>
 
-          <button
-            type="button"
-            onClick={sair}
-            className="hidden sm:inline-flex text-sm font-medium text-slate-500 hover:text-red-600 transition-colors"
-          >
-            Sair
-          </button>
+            {menuUsuarioAberto && (
+              <>
+                <button
+                  type="button"
+                  className="fixed inset-0 z-40 cursor-default"
+                  onClick={fecharMenuUsuario}
+                  aria-hidden
+                  tabIndex={-1}
+                />
+                <div
+                  role="menu"
+                  className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl"
+                >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={abrirEmblemas}
+                    className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium text-slate-700 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
+                  >
+                    <span aria-hidden>🏅</span>
+                    Meus emblemas
+                  </button>
+                  <div className="my-1 border-t border-slate-100" />
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={sair}
+                    className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-600"
+                  >
+                    <span aria-hidden>↩</span>
+                    Sair da conta
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
 
           <button
             type="button"
@@ -167,8 +223,15 @@ function Navbar() {
                 </div>
               ))}
 
-              <div className="border-t border-slate-100 pt-6 space-y-3">
-                <p className="text-sm font-medium text-slate-700">{nomeUsuario}</p>
+              <div className="border-t border-slate-100 pt-6 space-y-1">
+                <p className="text-sm font-medium text-slate-700 mb-2">{nomeUsuario}</p>
+                <button
+                  type="button"
+                  onClick={abrirEmblemas}
+                  className="w-full text-left rounded-lg px-3 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  🏅 Meus emblemas
+                </button>
                 <button
                   type="button"
                   onClick={sair}
@@ -181,6 +244,12 @@ function Navbar() {
           </div>
         </>
       )}
+
+      <MeusEmblemasModal
+        aberto={modalEmblemasAberto}
+        onFechar={() => setModalEmblemasAberto(false)}
+      />
+      <EmblemaToast />
     </nav>
   );
 }
