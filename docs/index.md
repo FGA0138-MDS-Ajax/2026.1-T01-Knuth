@@ -21,7 +21,7 @@ O projeto integra dois pilares principais:
 ##  Tecnologias Utilizadas
 - **Frontend**: HTML, CSS, JavaScript  
 - **Backend**: Python (Flask/Django)  
-- **Banco de Dados**: PostgreSQL / MySQL (dependendo da fase do projeto)  
+- **Banco de Dados**: PostgreSQL
 - **Infraestrutura**: Hospedagem em nuvem (AWS, Azure, Vercel)  
 - **Arquitetura**: MVC (Model-View-Controller) + camada de Services  
 - **DevOps**: Docker (para conteinerização e deploy)  
@@ -46,8 +46,7 @@ Fluxo básico:
 
 ##  Equipe
 - **Alicia Doralice de Medeiros Maia** – Product Owner (PO)  
-- **Angeline Izaura de Lima Melo** – Analista de Qualidade  
-- **Beatriz Brandão Fidelis Batista** – Desenvolvedora Backend  
+- **Angeline Izaura de Lima Melo** – Analista de Qualidade   
 - **Bruno Ferreira Dornelas** – Desenvolvedor Backend
 - **Caio Breno De Souza Bezerra** – Desenvolvedor Frontend  
 - **Danielly Reis dos Santos** – Desenvolvedora Backend  
@@ -81,7 +80,7 @@ Fluxo básico:
 ###  Pré-requisitos
 - [Python 3.10+](https://www.python.org/downloads/)  
 - [Node.js](https://nodejs.org/)  
-- [PostgreSQL](https://www.postgresql.org/download/) ou MySQL  
+- [PostgreSQL](https://www.postgresql.org/download/)  
 - [Docker](https://www.docker.com/) (opcional)  
 - Git  
 

@@ -2,23 +2,21 @@
 
 **Versão 1.1** 
 
-## **Tabela Integrantes do Grupo:** 
-
- 
+## **Tabela - Integrantes do Grupo:** 
 
 | Mat | Nome | Função (responsabilidade) | Pontos de participação na elaboração | 
 | :--- | :--- | :--- | :--- | 
-| 242023210 | Alicia Doralice de Medeiros Maia | Dona do Produto - PO | 10 | 
-| 242023229 | Angeline Izaura de Lima Melo | Analista de Qualidade | 9.8 | 
-| 242015138 | Bruno Ferreira Dornelas | Desenvolvedor | 8.8 | 
-| 242015773 | Caio Breno De Souza Bezerra | Desenvolvedor | 8.8 | 
-| 261013753 | Danielly Reis dos Santos | Desenvolvedora | 8.8 | 
-| 232002655 | Gabriel Martins de Jesus da Silva | Desenvolvedor | 8.8 | 
-| 231034707 | Giovana Ferreira dos Santos | Desenvolvedora | 8.8 | 
-| 232003714 | Jônatas Davi Oliveira Farias | Desenvolvedor | 8.8 | 
-| 242023990 | Jorge Henrique Torres Gargalhone | Desenvolvedor | 8.8 | 
-| 251023602 | Kalebe Davi Sarmento da Silva | Desenvolvedor | 8.8 | 
-| 242032460 | Leonardo Lopes Cruz | Desenvolvedor | 8.8 | 
+| 242023210 | Alicia Doralice de Medeiros Maia | Dona do Produto - PO | 9.5 | 
+| 242023229 | Angeline Izaura de Lima Melo | Analista de Qualidade | 9.5 | 
+| 242015138 | Bruno Ferreira Dornelas | Desenvolvedor | 9.5 | 
+| 242015773 | Caio Breno De Souza Bezerra | Desenvolvedor | 9.5 | 
+| 261013753 | Danielly Reis dos Santos | Desenvolvedora | 9.5 | 
+| 232002655 | Gabriel Martins de Jesus da Silva | Desenvolvedor | 9.5 | 
+| 231034707 | Giovana Ferreira dos Santos | Desenvolvedora | 9.5 | 
+| 232003714 | Jônatas Davi Oliveira Farias | Desenvolvedor | 9.5 | 
+| 242023990 | Jorge Henrique Torres Gargalhone | Desenvolvedor | 9.5 | 
+| 251023602 | Kalebe Davi Sarmento da Silva | Desenvolvedor | 5.0 | 
+| 242032460 | Leonardo Lopes Cruz | Desenvolvedor | 9.5 | 
 
  
 --- 
