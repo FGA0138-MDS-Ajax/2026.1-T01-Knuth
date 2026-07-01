@@ -15,6 +15,7 @@ import {
 } from 'chart.js';
 import { apiUrl } from '../../config/api';
 import Navbar from '../common/Navbar';
+import { desbloquearEmblema } from '../../config/emblemas';
 
 ChartJS.register(
   CategoryScale,
@@ -81,6 +82,11 @@ export default function PaginaConsumoMedio() {
       if (data.ok) {
         setResultado(data.resultado);
         setConsumosCalculados(valores);
+
+        // RF08 — "Consumo em Queda": mês mais recente menor que o anterior.
+        if (valores.length >= 2 && valores[valores.length - 1] < valores[valores.length - 2]) {
+          desbloquearEmblema('consumo_em_queda');
+        }
       } else {
         setErro(data.erro || 'Não foi possível calcular a média.');
       }
@@ -114,6 +120,8 @@ export default function PaginaConsumoMedio() {
       }
 
       if (response.ok && data.ok) {
+        // RF08 — fez login e salvou a primeira simulação de consumo médio.
+        desbloquearEmblema('simulacao_salva');
         setSucesso('Simulação salva com sucesso! Redirecionando...');
         setTimeout(() => navigate('/home'), 900);
       } else {

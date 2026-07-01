@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .models import ModuloEducativo, ProgressoModulo
+from emblemas.services import desbloquear_varios
 
 logger = logging.getLogger(__name__)
 
@@ -115,11 +116,26 @@ def marcar_concluido(request):
             modulo=modulo,
         )
 
+        # RF08 — conclusão de 1 módulo e conclusão da trilha completa.
+        novos_emblemas = []
+        if criado:
+            novos_emblemas += desbloquear_varios(request.user, ['primeiro_modulo'])
+
+            total_modulos_ativos = ModuloEducativo.objects.filter(ativo=True).count()
+            total_concluidos = ProgressoModulo.objects.filter(
+                usuario=request.user,
+                modulo__ativo=True,
+            ).count()
+
+            if total_modulos_ativos > 0 and total_concluidos >= total_modulos_ativos:
+                novos_emblemas += desbloquear_varios(request.user, ['trilha_completa'])
+
         return JsonResponse(
             {
                 'ok': True,
                 'mensagem': f"Módulo {modulo_id} marcado como concluído.",
                 'ja_concluido': not criado,
+                'novos_emblemas': novos_emblemas,
             },
             status=200,
         )

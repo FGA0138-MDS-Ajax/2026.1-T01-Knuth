@@ -10,6 +10,7 @@ from django.views.decorators.http import require_http_methods
 
 from .models import SimulacaoConsumo, Eletrodomestico
 from .services import MotorCalculoEnergetico, CalculoEnergeticoError, SimuladorRF05
+from emblemas.services import desbloquear_varios, emblemas_por_consumos
 
 logger = logging.getLogger(__name__)
 
@@ -37,15 +38,20 @@ def calcular_media_mensal_view(request):
     try:
         dados = carregar_json(request)
         ##chama o calculo correto
+        consumos = dados.get("consumos")
         resultado = MotorCalculoEnergetico.calcular_media_mensal(
-            consumos_mensais_kwh=dados.get("consumos")
+            consumos_mensais_kwh=consumos
         )
+
+        # RF08 — redução de consumo: compara o mês atual com o mês anterior.
+        novos_emblemas = emblemas_por_consumos(request.user, consumos or [])
 
         return JsonResponse(
             {
                 "ok": True,
                 "mensagem": "Cálculo realizado com sucesso.",
                 "resultado": serializar_decimal(resultado),
+                "novos_emblemas": novos_emblemas,
             },
             status=200,
         )
@@ -95,12 +101,17 @@ def criar_simulacao_view(request):
             recomendacao=resultado.get("recomendacao", "Simulação de média gerada com sucesso."),
         )
 
+        # RF08 — login para salvar simulação de consumo médio + redução de consumo.
+        novos_emblemas = desbloquear_varios(request.user, ["simulacao_salva"])
+        novos_emblemas += emblemas_por_consumos(request.user, consumos or [])
+
         return JsonResponse(
             {
                 "ok": True,
                 "mensagem": "Simulação salva com sucesso.",
                 "simulacao_id": simulacao.id,
                 "resultado": serializar_decimal(resultado),
+                "novos_emblemas": novos_emblemas,
             },
             status=201,
         )
@@ -232,10 +243,14 @@ def listar_eletrodomesticos(request):
             }
         )
 
+    # RF08 — emblema opcional do catálogo do front: consultou eletrodomésticos.
+    novos_emblemas = desbloquear_varios(request.user, ["detetive_de_aparelhos"])
+
     return JsonResponse(
         {
             "ok": True,
             "eletrodomesticos": dados,
+            "novos_emblemas": novos_emblemas,
         },
         status=200,
     )
@@ -268,7 +283,13 @@ def analise_consumo_rf05(request):
                 ids_eletrodomesticos=ids_eletrodomesticos
             )
 
-            return JsonResponse({"resultado": resultado}, status=200)
+            # RF08 — uso do simulador / análise de consumo.
+            novos_emblemas = desbloquear_varios(request.user, ["simulador_em_acao"])
+
+            return JsonResponse(
+                {"ok": True, "resultado": resultado, "novos_emblemas": novos_emblemas},
+                status=200,
+            )
 
         except ValueError:
             #se não for numero real ou ultrassapar ou ser minimo no kWh

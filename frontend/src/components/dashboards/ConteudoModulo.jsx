@@ -1,4 +1,5 @@
 import React from 'react';
+import { desbloquearEmblema } from '../../config/emblemas';
 
 export function renderTextoComNegrito(texto) {
   const partes = texto.split(/(\*\*[^*]+\*\*)/g);
@@ -57,6 +58,23 @@ export function QuizModulo({ perguntas }) {
     if (respostas[indicePergunta] !== undefined) return;
     setRespostas((prev) => ({ ...prev, [indicePergunta]: indiceOpcao }));
   }
+
+  // RF08 — conquistas do quiz. Avalia sempre que todas as perguntas tiverem
+  // sido respondidas (cada pergunta é respondida uma única vez).
+  React.useEffect(() => {
+    const total = perguntas.length;
+    if (total === 0) return;
+    if (Object.keys(respostas).length < total) return;
+
+    // "Mente Curiosa" — concluiu o quiz (respondeu todas as perguntas).
+    desbloquearEmblema('mente_curiosa');
+
+    // "Quiz Perfeito" — acertou 100% das perguntas.
+    const todasCorretas = perguntas.every(
+      (pergunta, i) => pergunta.opcoes[respostas[i]]?.correta
+    );
+    if (todasCorretas) desbloquearEmblema('quiz_perfeito');
+  }, [respostas, perguntas]);
 
   return (
     <div className="space-y-6">

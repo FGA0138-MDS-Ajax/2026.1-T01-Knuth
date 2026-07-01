@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../common/Navbar';
-import { getModuloById, getModuloAnterior, getProximoModulo } from '../../data/modulos';
-import { marcarModuloConcluido, moduloEstaConcluido } from '../../config/progressoModulos';
+import { modulos, getModuloById, getModuloAnterior, getProximoModulo } from '../../data/modulos';
+import {
+  marcarModuloConcluido,
+  moduloEstaConcluido,
+  getModulosConcluidos,
+} from '../../config/progressoModulos';
+import { desbloquearEmblema } from '../../config/emblemas';
 import { BlocoConteudo, QuizModulo, renderTextoComNegrito } from './ConteudoModulo';
 
 export default function LeituraModulo() {
@@ -76,6 +81,17 @@ export default function LeituraModulo() {
   function handleMarcarConcluido() {
     marcarModuloConcluido(modulo.id);
     setConcluido(true);
+
+    // RF08 — concluiu qualquer módulo educativo.
+    desbloquearEmblema('primeiro_modulo');
+
+    // RF08 — concluiu todos os 8 módulos da trilha.
+    // marcarModuloConcluido já gravou este módulo no localStorage de forma
+    // síncrona, mas incluímos modulo.id no conjunto por segurança.
+    const concluidos = new Set([...getModulosConcluidos(), Number(modulo.id)]);
+    if (modulos.every((m) => concluidos.has(m.id))) {
+      desbloquearEmblema('trilha_completa');
+    }
   }
 
   function handleProximoModulo() {

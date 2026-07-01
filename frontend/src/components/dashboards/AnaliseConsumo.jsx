@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import Navbar from '../common/Navbar';
 import { apiUrl } from '../../config/api';
+import { desbloquearEmblema } from '../../config/emblemas';
 
 export default function AnaliseConsumo() {
   const [consumo, setConsumo] = useState('');
@@ -192,6 +193,8 @@ export default function AnaliseConsumo() {
                     const data = await resp.json();
                     if (resp.ok && data.resultado) {
                       setResultado(data.resultado);
+                      // RF08 — usou a Análise de Consumo pela primeira vez.
+                      desbloquearEmblema('simulador_em_acao');
                     } else {
                       setErro(data.erro || 'Erro ao analisar consumo.');
                     }
