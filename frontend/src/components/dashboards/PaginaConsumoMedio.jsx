@@ -120,6 +120,8 @@ export default function PaginaConsumoMedio() {
       }
 
       if (response.ok && data.ok) {
+        // RF08 — fez login e salvou a primeira simulação de consumo médio.
+        desbloquearEmblema('simulacao_salva');
         setSucesso('Simulação salva com sucesso! Redirecionando...');
         setTimeout(() => navigate('/home'), 900);
       } else {

@@ -24,6 +24,12 @@ const CHAVE = 'educaenergia_emblemas';
 // Catálogo de emblemas. A `imagem` aponta para os arquivos em /public.
 export const EMBLEMAS = [
   {
+    id: 'simulacao_salva',
+    nome: 'Primeira Simulação',
+    imagem: '/Simulador_em_Acao.png',
+    comoDesbloquear: 'Faça login e salve sua primeira simulação de consumo médio.',
+  },
+  {
     id: 'simulador_em_acao',
     nome: 'Simulador em Ação',
     imagem: '/Simulador_em_Acao.png',

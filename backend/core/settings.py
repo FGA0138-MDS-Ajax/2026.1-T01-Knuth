@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'usuarios',
     'consumo',
     'educacao',
+    'emblemas',
 ]
 
 MIDDLEWARE = [
