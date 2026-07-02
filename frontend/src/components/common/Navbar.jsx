@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { apiUrl } from '../../config/api';
 import { encerrarSessao, getNomeUsuario } from '../../config/auth';
@@ -22,6 +22,10 @@ const gruposMenu = [
     ],
   },
   {
+    titulo: 'Acompanhar',
+    itens: [{ label: 'Relatórios e Histórico', rota: '/relatorios' }],
+  },
+  {
     titulo: 'Aprender',
     itens: [{ label: 'Módulos educativos', rota: '/ListaModulos' }],
   },
@@ -37,6 +41,7 @@ const linksDesktop = [
   { label: 'Simulação', rota: '/consumo-medio' },
   { label: 'Eletrodomésticos', rota: '/eletrodomesticos' },
   { label: 'Análise', rota: '/rf05' },
+  { label: 'Relatórios', rota: '/relatorios' },
   { label: 'Aprendizagem', rota: '/ListaModulos' },
 ];
 
@@ -46,11 +51,28 @@ function Navbar() {
   const [menuAberto, setMenuAberto] = useState(false);
   const [menuUsuarioAberto, setMenuUsuarioAberto] = useState(false);
   const [modalEmblemasAberto, setModalEmblemasAberto] = useState(false);
+  const menuUsuarioRef = useRef(null);
   const nomeUsuario = getNomeUsuario() || 'Visitante';
   const inicial = nomeUsuario.charAt(0).toUpperCase();
 
   const fecharMenu = () => setMenuAberto(false);
   const fecharMenuUsuario = () => setMenuUsuarioAberto(false);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuUsuarioRef.current && !menuUsuarioRef.current.contains(event.target)) {
+        fecharMenuUsuario();
+      }
+    }
+    if (menuUsuarioAberto) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [menuUsuarioAberto]);
 
   const abrirEmblemas = () => {
     fecharMenu();
@@ -107,7 +129,7 @@ function Navbar() {
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-4">
-          <div className="relative hidden md:block">
+          <div className="relative hidden md:block" ref={menuUsuarioRef}>
             <button
               type="button"
               onClick={() => setMenuUsuarioAberto((v) => !v)}
@@ -132,18 +154,10 @@ function Navbar() {
             </button>
 
             {menuUsuarioAberto && (
-              <>
-                <button
-                  type="button"
-                  className="fixed inset-0 z-40 cursor-default"
-                  onClick={fecharMenuUsuario}
-                  aria-hidden
-                  tabIndex={-1}
-                />
-                <div
-                  role="menu"
-                  className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl"
-                >
+              <div
+                role="menu"
+                className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl"
+              >
                   <button
                     type="button"
                     role="menuitem"
@@ -164,7 +178,6 @@ function Navbar() {
                     Sair da conta
                   </button>
                 </div>
-              </>
             )}
           </div>
 
