@@ -28,79 +28,28 @@ ChartJS.register(
   Legend
 );
 
-// Tarifa de referência (bandeira verde), a mesma usada pelo backend nos
-// eletrodomésticos. Simulações antigas foram salvas com custo 0, então o
-// gasto é derivado do consumo persistido quando o custo não existe no banco.
-const TARIFA_REFERENCIA = 0.85;
-
 const formatoReais = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
 });
 
 const formatoKwh = new Intl.NumberFormat('pt-BR', {
-  maximumFractionDigits: 1,
+  maximumFractionDigits: 2,
 });
 
-function gastoDaSimulacao(simulacao) {
-  const custoSalvo = parseFloat(simulacao.custo_estimado_reais);
-  if (custoSalvo > 0) return custoSalvo;
-  return parseFloat(simulacao.consumo_medio_mensal_kwh) * TARIFA_REFERENCIA;
-}
-
-function rotuloMes(data) {
-  const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
-  return `${mes}/${String(data.getFullYear()).slice(-2)}`;
-}
-
-// Agrega as simulações por mês de criação: consumo médio, gasto estimado
-// e variação percentual em relação ao mês anterior.
-function agregarPorMes(simulacoes) {
-  const porMes = new Map();
-
-  for (const simulacao of simulacoes) {
-    const data = new Date(simulacao.criado_em);
-    const chave = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
-
-    if (!porMes.has(chave)) {
-      porMes.set(chave, { chave, rotulo: rotuloMes(data), consumos: [], gastos: [] });
-    }
-
-    const mes = porMes.get(chave);
-    mes.consumos.push(parseFloat(simulacao.consumo_medio_mensal_kwh));
-    mes.gastos.push(gastoDaSimulacao(simulacao));
-  }
-
-  const media = (valores) =>
-    valores.reduce((soma, v) => soma + v, 0) / valores.length;
-
-  const meses = [...porMes.values()]
-    .sort((a, b) => a.chave.localeCompare(b.chave))
-    .map((mes) => ({
-      chave: mes.chave,
-      rotulo: mes.rotulo,
-      simulacoes: mes.consumos.length,
-      consumoMedioKwh: media(mes.consumos),
-      gastoEstimado: media(mes.gastos),
-    }));
-
-  return meses.map((mes, i) => {
-    const anterior = meses[i - 1];
-    const variacaoPercentual =
-      anterior && anterior.consumoMedioKwh > 0
-        ? ((mes.consumoMedioKwh - anterior.consumoMedioKwh) / anterior.consumoMedioKwh) * 100
-        : null;
-    return { ...mes, variacaoPercentual };
-  });
+function numeroSeguro(valor) {
+  const numero = Number.parseFloat(valor);
+  return Number.isFinite(numero) ? numero : 0;
 }
 
 function VariacaoBadge({ percentual }) {
-  if (percentual === null || Number.isNaN(percentual)) {
+  if (percentual === null || percentual === undefined || Number.isNaN(Number(percentual))) {
     return <span className="text-slate-400">—</span>;
   }
 
-  const subiu = percentual > 0;
-  const estavel = Math.abs(percentual) < 0.05;
+  const valor = Number(percentual);
+  const subiu = valor > 0;
+  const estavel = Math.abs(valor) < 0.05;
 
   if (estavel) {
     return (
@@ -117,7 +66,7 @@ function VariacaoBadge({ percentual }) {
       }`}
     >
       <span aria-hidden>{subiu ? '▲' : '▼'}</span>
-      {Math.abs(percentual).toFixed(1)}%
+      {Math.abs(valor).toFixed(1)}%
     </span>
   );
 }
@@ -132,7 +81,7 @@ const escalaBase = {
 };
 
 export default function RelatorioGastos() {
-  const [simulacoes, setSimulacoes] = useState([]);
+  const [relatorio, setRelatorio] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
 
@@ -141,19 +90,24 @@ export default function RelatorioGastos() {
 
     async function carregar() {
       try {
-        const response = await fetch(apiUrl('/api/consumo/simulacoes/minhas/'), {
+        const response = await fetch(apiUrl('/api/consumo/relatorio-gastos/'), {
           credentials: 'include',
         });
         const data = await response.json();
+
         if (!ativo) return;
-        if (data.ok) {
-          setSimulacoes(data.simulacoes || []);
+
+        if (response.ok && data.ok) {
+          setRelatorio(data);
+          setErro('');
         } else {
           setErro(data.erro || 'Não foi possível carregar o relatório.');
+          setRelatorio(null);
         }
       } catch {
         if (ativo) {
           setErro('Falha de conexão com o servidor. Verifique se o backend está rodando.');
+          setRelatorio(null);
         }
       } finally {
         if (ativo) setCarregando(false);
@@ -166,24 +120,27 @@ export default function RelatorioGastos() {
     };
   }, []);
 
-  const meses = useMemo(() => agregarPorMes(simulacoes), [simulacoes]);
+  const historico = relatorio?.historico || [];
+  const seriesMensais = relatorio?.series_mensais || [];
+  const resumo = relatorio?.resumo || {};
+  const graficos = relatorio?.graficos || {};
 
-  const historico = useMemo(
-    () =>
-      [...simulacoes].sort(
-        (a, b) => new Date(b.criado_em) - new Date(a.criado_em)
-      ),
-    [simulacoes]
+  const labels = graficos.meses || [];
+  const consumoMensal = useMemo(
+    () => (graficos.consumo_mensal_kwh || []).map(numeroSeguro),
+    [graficos.consumo_mensal_kwh]
+  );
+  const gastosEstimados = useMemo(
+    () => (graficos.gastos_estimados_reais || []).map(numeroSeguro),
+    [graficos.gastos_estimados_reais]
   );
 
-  const mesAtual = meses[meses.length - 1] || null;
-
   const consumoChart = {
-    labels: meses.map((m) => m.rotulo),
+    labels,
     datasets: [
       {
-        label: 'Consumo médio (kWh/mês)',
-        data: meses.map((m) => m.consumoMedioKwh),
+        label: 'Consumo mensal (kWh)',
+        data: consumoMensal,
         borderColor: 'rgb(16, 185, 129)',
         backgroundColor: 'rgba(16, 185, 129, 0.12)',
         pointBackgroundColor: 'rgb(16, 185, 129)',
@@ -219,11 +176,11 @@ export default function RelatorioGastos() {
   };
 
   const gastoChart = {
-    labels: meses.map((m) => m.rotulo),
+    labels,
     datasets: [
       {
         label: 'Gasto estimado (R$/mês)',
-        data: meses.map((m) => m.gastoEstimado),
+        data: gastosEstimados,
         backgroundColor: 'rgba(6, 182, 212, 0.65)',
         hoverBackgroundColor: 'rgba(6, 182, 212, 0.9)',
         borderRadius: 6,
@@ -265,8 +222,7 @@ export default function RelatorioGastos() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-slate-900">Relatórios e Histórico</h1>
             <p className="mt-1 text-slate-500">
-              Acompanhe a evolução do seu consumo e dos gastos estimados a partir das
-              suas simulações salvas.
+              Acompanhe sua evolução energética e financeira com base nas simulações salvas no banco.
             </p>
           </div>
 
@@ -282,7 +238,7 @@ export default function RelatorioGastos() {
             </div>
           )}
 
-          {!carregando && !erro && simulacoes.length === 0 && (
+          {!carregando && !erro && historico.length === 0 && (
             <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-emerald-100 bg-white/80 p-8 text-center shadow-sm backdrop-blur-sm">
               <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-2xl">
                 📊
@@ -291,44 +247,51 @@ export default function RelatorioGastos() {
                 Você ainda não tem simulações salvas.
               </p>
               <p className="mt-1 max-w-sm text-sm text-slate-400">
-                Salve sua primeira simulação de consumo para começar a acompanhar seu
-                histórico financeiro e energético.
+                Use a Análise de Consumo ou salve uma simulação de consumo médio para iniciar seu histórico.
               </p>
-              <Link
-                to="/consumo-medio"
-                className="mt-5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110"
-              >
-                Fazer minha primeira simulação
-              </Link>
+              <div className="mt-5 flex flex-wrap justify-center gap-3">
+                <Link
+                  to="/rf05"
+                  className="rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110"
+                >
+                  Fazer análise de consumo
+                </Link>
+                <Link
+                  to="/consumo-medio"
+                  className="rounded-xl border border-emerald-200 bg-white px-5 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                >
+                  Nova simulação
+                </Link>
+              </div>
             </div>
           )}
 
-          {!carregando && !erro && simulacoes.length > 0 && (
+          {!carregando && !erro && historico.length > 0 && (
             <div className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="rounded-2xl border border-emerald-100 bg-white/80 p-5 shadow-sm backdrop-blur-sm">
                   <p className="text-sm text-slate-500">Simulações salvas</p>
                   <p className="mt-1 text-2xl font-bold text-slate-900">
-                    {simulacoes.length}
+                    {resumo.total_simulacoes || 0}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-emerald-100 bg-white/80 p-5 shadow-sm backdrop-blur-sm">
                   <p className="text-sm text-slate-500">Consumo no último mês</p>
                   <p className="mt-1 text-2xl font-bold text-slate-900">
-                    {formatoKwh.format(mesAtual.consumoMedioKwh)}
+                    {formatoKwh.format(numeroSeguro(resumo.consumo_ultimo_mes_kwh))}
                     <span className="ml-1 text-sm font-medium text-slate-400">kWh/mês</span>
                   </p>
                 </div>
                 <div className="rounded-2xl border border-emerald-100 bg-white/80 p-5 shadow-sm backdrop-blur-sm">
                   <p className="text-sm text-slate-500">Gasto estimado no último mês</p>
                   <p className="mt-1 text-2xl font-bold text-slate-900">
-                    {formatoReais.format(mesAtual.gastoEstimado)}
+                    {formatoReais.format(numeroSeguro(resumo.gasto_ultimo_mes_reais))}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-emerald-100 bg-white/80 p-5 shadow-sm backdrop-blur-sm">
                   <p className="text-sm text-slate-500">Variação vs. mês anterior</p>
                   <p className="mt-2">
-                    <VariacaoBadge percentual={mesAtual.variacaoPercentual} />
+                    <VariacaoBadge percentual={resumo.variacao_ultimo_mes_percentual} />
                   </p>
                 </div>
               </div>
@@ -336,10 +299,10 @@ export default function RelatorioGastos() {
               <div className="grid gap-6 lg:grid-cols-2">
                 <div className="rounded-2xl border border-emerald-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm">
                   <h2 className="text-sm font-semibold text-slate-700">
-                    Consumo médio ao longo dos meses
+                    Consumo mensal ao longo do tempo
                   </h2>
                   <p className="mb-4 text-xs text-slate-400">
-                    Média das simulações registradas em cada mês (kWh/mês).
+                    Série mensal retornada pelo backend a partir dos registros persistidos.
                   </p>
                   <div className="h-64">
                     <Line data={consumoChart} options={consumoOptions} />
@@ -351,8 +314,7 @@ export default function RelatorioGastos() {
                     Gasto estimado por mês
                   </h2>
                   <p className="mb-4 text-xs text-slate-400">
-                    Tarifa de referência de {formatoReais.format(TARIFA_REFERENCIA)}/kWh
-                    (bandeira verde).
+                    Valores salvos no banco em cada simulação.
                   </p>
                   <div className="h-64">
                     <Bar data={gastoChart} options={gastoOptions} />
@@ -360,12 +322,61 @@ export default function RelatorioGastos() {
                 </div>
               </div>
 
-              {meses.length === 1 && (
+              {seriesMensais.length === 1 && (
                 <div className="rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm text-cyan-800">
-                  Você tem simulações em apenas 1 mês. Continue salvando simulações nos
-                  próximos meses para visualizar a curva de evolução e a variação.
+                  Seu relatório já funciona com apenas 1 mês registrado. Continue salvando novas simulações
+                  nos próximos meses para visualizar a variação de consumo.
                 </div>
               )}
+
+              <div className="rounded-2xl border border-emerald-100 bg-white/80 shadow-sm backdrop-blur-sm">
+                <div className="border-b border-emerald-100/80 px-6 py-4">
+                  <h2 className="text-sm font-semibold text-slate-700">
+                    Resumo mensal
+                  </h2>
+                  <p className="text-xs text-slate-400">
+                    Consumo, gasto estimado e variação agregados por mês.
+                  </p>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="text-xs uppercase tracking-wide text-slate-400">
+                        <th className="px-6 py-3 font-semibold">Mês</th>
+                        <th className="px-6 py-3 font-semibold text-right">Simulações</th>
+                        <th className="px-6 py-3 font-semibold text-right">Consumo mensal</th>
+                        <th className="px-6 py-3 font-semibold text-right">Gasto estimado</th>
+                        <th className="px-6 py-3 font-semibold text-right">Variação</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {seriesMensais.map((mes) => (
+                        <tr
+                          key={mes.chave}
+                          className="border-t border-slate-100 transition-colors hover:bg-emerald-50/40"
+                        >
+                          <td className="whitespace-nowrap px-6 py-3.5 font-medium text-slate-700">
+                            {mes.rotulo}
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-3.5 text-right text-slate-500">
+                            {mes.quantidade_simulacoes}
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-3.5 text-right text-slate-700">
+                            {formatoKwh.format(numeroSeguro(mes.consumo_mensal_kwh))}{' '}
+                            <span className="text-slate-400">kWh/mês</span>
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-3.5 text-right font-medium text-slate-700">
+                            {formatoReais.format(numeroSeguro(mes.gasto_estimado_reais))}
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-3.5 text-right">
+                            <VariacaoBadge percentual={mes.variacao_percentual} />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
               <div className="rounded-2xl border border-emerald-100 bg-white/80 shadow-sm backdrop-blur-sm">
                 <div className="border-b border-emerald-100/80 px-6 py-4">
@@ -383,12 +394,8 @@ export default function RelatorioGastos() {
                         <th className="px-6 py-3 font-semibold">Data</th>
                         <th className="px-6 py-3 font-semibold">Título</th>
                         <th className="px-6 py-3 font-semibold">Período</th>
-                        <th className="px-6 py-3 font-semibold text-right">
-                          Consumo médio
-                        </th>
-                        <th className="px-6 py-3 font-semibold text-right">
-                          Gasto estimado
-                        </th>
+                        <th className="px-6 py-3 font-semibold text-right">Consumo médio</th>
+                        <th className="px-6 py-3 font-semibold text-right">Gasto estimado</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -408,13 +415,11 @@ export default function RelatorioGastos() {
                             {simulacao.meses_analisados === 1 ? 'mês' : 'meses'}
                           </td>
                           <td className="whitespace-nowrap px-6 py-3.5 text-right text-slate-700">
-                            {formatoKwh.format(
-                              parseFloat(simulacao.consumo_medio_mensal_kwh)
-                            )}{' '}
+                            {formatoKwh.format(numeroSeguro(simulacao.consumo_medio_mensal_kwh))}{' '}
                             <span className="text-slate-400">kWh/mês</span>
                           </td>
                           <td className="whitespace-nowrap px-6 py-3.5 text-right font-medium text-slate-700">
-                            {formatoReais.format(gastoDaSimulacao(simulacao))}
+                            {formatoReais.format(numeroSeguro(simulacao.custo_estimado_reais))}
                           </td>
                         </tr>
                       ))}
