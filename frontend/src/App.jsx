@@ -6,7 +6,6 @@ import PainelScreen from './components/home/PainelScreen'
 import PaginaConsumoMedio from './components/dashboards/PaginaConsumoMedio'
 import PaginaEletrodomesticos from './components/dashboards/PaginaEletrodomesticos'
 import AnaliseConsumo from './components/dashboards/AnaliseConsumo'
-import RelatorioGastos from './components/dashboards/RelatorioGastos'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { estaLogado } from './config/auth'
@@ -60,14 +59,6 @@ export default function App() {
         element={
           <ProtectedRoute>
             <AnaliseConsumo />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/relatorios"
-        element={
-          <ProtectedRoute>
-            <RelatorioGastos />
           </ProtectedRoute>
         }
       />
