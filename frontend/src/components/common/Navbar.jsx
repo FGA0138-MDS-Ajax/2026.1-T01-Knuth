@@ -22,6 +22,10 @@ const gruposMenu = [
     ],
   },
   {
+    titulo: 'Acompanhar',
+    itens: [{ label: 'Relatórios e Histórico', rota: '/relatorios' }],
+  },
+  {
     titulo: 'Aprender',
     itens: [{ label: 'Módulos educativos', rota: '/ListaModulos' }],
   },
@@ -37,6 +41,7 @@ const linksDesktop = [
   { label: 'Simulação', rota: '/consumo-medio' },
   { label: 'Eletrodomésticos', rota: '/eletrodomesticos' },
   { label: 'Análise', rota: '/rf05' },
+  { label: 'Relatórios', rota: '/relatorios' },
   { label: 'Aprendizagem', rota: '/ListaModulos' },
 ];
 
