@@ -106,6 +106,8 @@ Se o ambiente virtual já existir, ative com:
 ```bash
 #Windows
 .\.venv\Scripts\Activate.ps1
+##se nao der certo, teste
+.venv\Scripts\activate.bat
 
 #Linux/macOS
 source .venv/bin/activate
