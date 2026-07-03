@@ -39,6 +39,7 @@ def fazer_login(request):
                     "username": usuario.username, # Ajustado para mostrar o username real
                     "email": usuario.email,
                     "nome": usuario.first_name,
+                    "is_staff": usuario.is_staff, # RF10 - front decide se mostra o painel admin
                 }
             }, status=200)
         
