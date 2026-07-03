@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'usuarios',
     'consumo',
     'educacao',
+    'admin_painel',   # RF10 — Painel Administrativo
     'emblemas',
 ]
 
