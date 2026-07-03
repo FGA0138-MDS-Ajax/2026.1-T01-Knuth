@@ -1,10 +1,8 @@
 from decimal import Decimal
-from datetime import timedelta
 import json
 from django.test import TestCase, SimpleTestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from django.utils import timezone
 from .services import MotorCalculoEnergetico, CalculoEnergeticoError, SimuladorRF05
 from .models import SimulacaoConsumo, Eletrodomestico
 
