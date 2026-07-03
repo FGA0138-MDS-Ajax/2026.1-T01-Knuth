@@ -383,3 +383,161 @@ class RF05SimuladorTests(TestCase):
         self.assertEqual(resultado["status_consumo"], "acima_do_ideal")
         self.assertNotIn("Geladeira", resultado["recomendacao"])
         self.assertIn("Verifique se não existem luzes acesas", resultado["recomendacao"])
+
+        def test_api_analise_consumo_erro_valores_invalidos(self):
+            """Garante que o backend barra consumos zerados ou negativos com HTTP 400."""
+            usuario = get_user_model().objects.create_user(username="valida_erro", password="123")
+            self.client.login(username="valida_erro", password="123")
+
+            # Testando consumo zero
+            payload = {"consumo_real_kwh": 0, "eletrodomesticos_selecionados": ["Ar Condicionado"]}
+            resposta = self.client.post(reverse("analise-consumo-rf05"), data=json.dumps(payload),
+                                        content_type="application/json")
+            self.assertEqual(resposta.status_code, 400)
+            self.assertIn("maior que zero", resposta.json()["erro"])
+
+        def test_calculo_meta_reducao_arredondamento_minimo(self):
+            """Valida que o gerador de metas arredonda para múltiplos de 5 e impõe mínimo de 5 minutos."""
+            # Criamos uma situação controlada de aparelhos simulados para a função privada
+            aparelhos_para_reduzir = [{
+                "nome": "Chuveiro Elétrico",
+                "potencia": Decimal("5500"),
+                "kwh_mensal": Decimal("50.00")
+            }]
+
+            # Um excesso pequeno geraria minutos muito baixos. O sistema deve forçar 5 minutos.
+            meta_texto = SimuladorRF05._calcular_metas_de_reducao(Decimal("5"), aparelhos_para_reduzir)
+            self.assertIn("Reduza cerca de 5 minutos", meta_texto)
+
+# ------------------------------------------------------------------------------
+# TESTES DA RF09 — RELATÓRIO DE GASTOS
+# ------------------------------------------------------------------------------
+
+class RelatorioGastosRF09Tests(TestCase):
+    def setUp(self):
+        self.usuario = User.objects.create_user(username="usuario_rf09", password="senha123")
+        self.outro_usuario = User.objects.create_user(username="outro_rf09", password="senha123")
+        self.url_rf05 = reverse("analise-consumo-rf05")
+        self.url_relatorio = reverse("relatorio-gastos")
+
+        Eletrodomestico.objects.create(
+            nome="Chuveiro elétrico",
+            potencia_media_watts=5500,
+            tempo_medio_uso_minutos=10,
+            descricao_uso="Uso médio de 10 minutos por dia",
+            destaque=True,
+        )
+
+    def test_rf05_salva_simulacao_com_data_e_custo(self):
+        self.client.login(username="usuario_rf09", password="senha123")
+        resposta = self.client.post(
+            self.url_rf05,
+            data=json.dumps({
+                "consumo_real_kwh": 250,
+                "eletrodomesticos_selecionados": ["Chuveiro elétrico"],
+            }),
+            content_type="application/json",
+        )
+
+        self.assertEqual(resposta.status_code, 201)
+        self.assertEqual(SimulacaoConsumo.objects.filter(usuario=self.usuario).count(), 1)
+
+        simulacao = SimulacaoConsumo.objects.get(usuario=self.usuario)
+        self.assertIsNotNone(simulacao.criado_em)
+        self.assertEqual(simulacao.meses_analisados, 1)
+        self.assertEqual(simulacao.consumo_medio_mensal_kwh, Decimal("250.00"))
+        self.assertEqual(simulacao.custo_estimado_reais, Decimal("212.50"))
+
+    def test_relatorio_funciona_com_apenas_um_mes(self):
+        SimulacaoConsumo.objects.create(
+            usuario=self.usuario,
+            titulo="Análise única",
+            meses_analisados=1,
+            total_consumo_mensal_kwh=Decimal("180.00"),
+            consumo_medio_mensal_kwh=Decimal("180.00"),
+            custo_estimado_reais=Decimal("153.00"),
+            status_consumo="dentro_do_ideal",
+            recomendacao="Consumo dentro do esperado.",
+        )
+
+        self.client.login(username="usuario_rf09", password="senha123")
+        resposta = self.client.get(self.url_relatorio)
+
+        self.assertEqual(resposta.status_code, 200)
+        dados = resposta.json()
+        self.assertTrue(dados["ok"])
+        self.assertEqual(len(dados["series_mensais"]), 1)
+        self.assertIsNone(dados["series_mensais"][0]["variacao_percentual"])
+        self.assertEqual(dados["resumo"]["total_simulacoes"], 1)
+
+    def test_relatorio_isola_dados_por_usuario(self):
+        SimulacaoConsumo.objects.create(
+            usuario=self.usuario,
+            titulo="Simulação do usuário correto",
+            meses_analisados=1,
+            total_consumo_mensal_kwh=Decimal("120.00"),
+            consumo_medio_mensal_kwh=Decimal("120.00"),
+            custo_estimado_reais=Decimal("102.00"),
+        )
+        SimulacaoConsumo.objects.create(
+            usuario=self.outro_usuario,
+            titulo="Simulação de outro usuário",
+            meses_analisados=1,
+            total_consumo_mensal_kwh=Decimal("999.00"),
+            consumo_medio_mensal_kwh=Decimal("999.00"),
+            custo_estimado_reais=Decimal("849.15"),
+        )
+
+        self.client.login(username="usuario_rf09", password="senha123")
+        resposta = self.client.get(self.url_relatorio)
+
+        self.assertEqual(resposta.status_code, 200)
+        historico = resposta.json()["historico"]
+        titulos = [item["titulo"] for item in historico]
+
+        self.assertEqual(titulos, ["Simulação do usuário correto"])
+        self.assertNotIn("Simulação de outro usuário", titulos)
+
+    def test_relatorio_calcula_variacao_entre_meses(self):
+        primeira = SimulacaoConsumo.objects.create(
+            usuario=self.usuario,
+            titulo="Mês anterior",
+            meses_analisados=1,
+            total_consumo_mensal_kwh=Decimal("200.00"),
+            consumo_medio_mensal_kwh=Decimal("200.00"),
+            custo_estimado_reais=Decimal("170.00"),
+        )
+        segunda = SimulacaoConsumo.objects.create(
+            usuario=self.usuario,
+            titulo="Mês atual",
+            meses_analisados=1,
+            total_consumo_mensal_kwh=Decimal("150.00"),
+            consumo_medio_mensal_kwh=Decimal("150.00"),
+            custo_estimado_reais=Decimal("127.50"),
+        )
+
+        agora = timezone.now()
+        SimulacaoConsumo.objects.filter(id=primeira.id).update(criado_em=agora - timedelta(days=35))
+        SimulacaoConsumo.objects.filter(id=segunda.id).update(criado_em=agora)
+
+        self.client.login(username="usuario_rf09", password="senha123")
+        resposta = self.client.get(self.url_relatorio)
+
+        self.assertEqual(resposta.status_code, 200)
+        series = resposta.json()["series_mensais"]
+        self.assertEqual(len(series), 2)
+        self.assertEqual(series[1]["variacao_percentual"], "-25.00")
+
+
+    def test_relatorio_gastos_usuario_anonimo(self):
+        """Segurança: Garante que um usuário deslogado recebe 401 ao tentar ver o relatório."""
+        resposta = self.client.get(self.url_relatorio)
+        self.assertEqual(resposta.status_code, 401)
+        self.assertFalse(resposta.json()["ok"])
+
+
+    def test_analise_consumo_rf05_usuario_anonimo(self):
+        """Segurança: Garante que um usuário deslogado recebe 401 ao tentar analisar o consumo."""
+        payload = {"consumo_real_kwh": 150, "eletrodomesticos_selecionados": ["Chuveiro elétrico"]}
+        resposta = self.client.post(self.url_rf05, data=json.dumps(payload), content_type="application/json")
+        self.assertEqual(resposta.status_code, 401)
