@@ -149,3 +149,62 @@ class UsuariosAPITestCase(TestCase):
         self.assertEqual(resposta.status_code, 400)
         self.assertFalse(dados["ok"])
         self.assertEqual(dados["erro"], "JSON inválido.")
+
+    # ==============================================================================
+    # TESTES DA FUNCIONALIDADE: ESQUECEU SUA SENHA & RESET DE SENHA
+    # ==============================================================================
+
+    def test_reseta_senha_sucesso(self):
+        """Teste de Integração: Altera com sucesso a senha usando UID e Token válidos."""
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+        from django.contrib.auth.tokens import default_token_generator
+
+        # Gerando os parâmetros válidos que a view espera receber
+        uidb64 = urlsafe_base64_encode(force_bytes(self.usuario.pk))
+        token = default_token_generator.make_token(self.usuario)
+
+        payload = {
+            "uid": uidb64,
+            "token": token,
+            "password": "NovaSenhaSuperSegura123!"
+        }
+
+        resposta = self.client.post(
+            reverse('reseta_senha'),
+            data=json.dumps(payload),
+            content_type="application/json"
+        )
+
+        # Correção da string real do seu backend
+        self.assertEqual(resposta.status_code, 200)
+        dados = resposta.json()
+        self.assertEqual(dados["detail"], "Senha alterada com sucesso!")
+
+        # Valida se o login antigo falha e se a nova senha foi persistida corretamente
+        self.usuario.refresh_from_db()
+        self.assertTrue(self.usuario.check_password("NovaSenhaSuperSegura123!"))
+
+    def test_reseta_senha_token_invalido(self):
+        """Teste Unitário/Segurança: Recusa a redefinição se o token for corrompido ou adulterado."""
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+
+        uidb64 = urlsafe_base64_encode(force_bytes(self.usuario.pk))
+        token_adulterado = "token-totalmente-falso-e-errado"
+
+        payload = {
+            "uid": uidb64,
+            "token": token_adulterado,
+            "password": "SenhaValida123!"
+        }
+
+        resposta = self.client.post(
+            reverse('reseta_senha'),
+            data=json.dumps(payload),
+            content_type="application/json"
+        )
+
+        self.assertEqual(resposta.status_code, 400)
+        dados = resposta.json()
+        self.assertIn("Link inválido ou expirado.", dados["detail"])

@@ -7,6 +7,7 @@ import PaginaConsumoMedio from './components/dashboards/PaginaConsumoMedio'
 import PaginaEletrodomesticos from './components/dashboards/PaginaEletrodomesticos'
 import AnaliseConsumo from './components/dashboards/AnaliseConsumo'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import EsqueceuSuaSenha from './components/auth/EsqueceuSuaSenha'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { estaLogado } from './config/auth'
 import ListaModulos from './components/dashboards/ListaModulos'
@@ -79,6 +80,8 @@ export default function App() {
         }
       />
       <Route path="*" element={<Navigate to="/login" replace />} />
+       <Route path="/esqueceu-sua-senha" element={<EsqueceuSuaSenha />} />
+    <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   )
 }
