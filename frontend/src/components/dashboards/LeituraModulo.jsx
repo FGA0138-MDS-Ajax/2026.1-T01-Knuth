@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import Navbar from '../common/Navbar';
-import { modulos, getModuloById, getModuloAnterior, getProximoModulo } from '../../data/modulos';
+import Navbar from '../common/Navbar.jsx';
+import { modulos, getModuloById, getModuloAnterior, getProximoModulo } from '../../data/modulos/index.js';
 import {
   marcarModuloConcluido,
   moduloEstaConcluido,
   getModulosConcluidos,
-} from '../../config/progressoModulos';
-import { desbloquearEmblema } from '../../config/emblemas';
+} from '../config/progressoModulos.js';
+import { desbloquearEmblema } from '../config/emblemas.js';
 import { BlocoConteudo, QuizModulo, renderTextoComNegrito } from './ConteudoModulo';
 
 export default function LeituraModulo() {

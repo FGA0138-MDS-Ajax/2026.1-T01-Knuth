@@ -1,6 +1,6 @@
 import React from 'react';
-import Navbar from '../common/Navbar';
-import DashboardTelaPrincipal from '../dashboards/DashboardTelaPrincipal';
+import Navbar from '../common/Navbar.jsx';
+import DashboardTelaPrincipal from '../dashboards/DashboardTelaPrincipal.jsx';
 
 export default function PainelScreen() {
   return (

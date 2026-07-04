@@ -7,7 +7,7 @@ import json
 import logging
 
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
@@ -99,7 +99,7 @@ def bandeiras_detail(request, pk):
 
     if request.method == "DELETE":
         bandeira.delete()
-        return JsonResponse({}, status=204)
+        return HttpResponse(status=204)
 
     # PUT — atualizar
     try:
@@ -174,7 +174,7 @@ def eletrodomesticos_detail(request, pk):
 
     if request.method == "DELETE":
         eletro.delete()
-        return JsonResponse({}, status=204)
+        return HttpResponse(status=204)
 
     # PUT
     try:
@@ -252,7 +252,7 @@ def modulos_detail(request, pk):
 
     if request.method == "DELETE":
         modulo.delete()
-        return JsonResponse({}, status=204)
+        return HttpResponse(status=204)
 
     # PUT
     try:
@@ -340,7 +340,7 @@ def quizzes_detail(request, pk):
 
     if request.method == "DELETE":
         pergunta.delete()
-        return JsonResponse({}, status=204)
+        return HttpResponse(status=204)
 
     # PUT
     try:

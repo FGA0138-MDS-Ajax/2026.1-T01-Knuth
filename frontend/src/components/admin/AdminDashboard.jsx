@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { adminApi } from '../../config/adminApi'
-import { getNomeUsuario } from '../../config/auth'
+import { adminApi } from '../config/adminApi.js'
+import { getNomeUsuario } from '../config/auth.js'
 
 // Lê um valor de estatística tolerando nomes alternativos vindos do backend.
 function ler(dados, ...chaves) {

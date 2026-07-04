@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import Navbar from '../common/Navbar';
-import { apiUrl } from '../../config/api';
-import { desbloquearEmblema } from '../../config/emblemas';
+import Navbar from '../common/Navbar.jsx';
+import { apiUrl } from '../config/api.js';
+import { desbloquearEmblema } from '../config/emblemas.js';
 
 export default function AnaliseConsumo() {
   const [consumo, setConsumo] = useState('');

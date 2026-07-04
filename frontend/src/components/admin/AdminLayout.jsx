@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { apiUrl } from '../../config/api'
-import { encerrarSessao, getNomeUsuario } from '../../config/auth'
+import { apiUrl } from '../config/api.js'
+import { encerrarSessao, getNomeUsuario } from '../config/auth.js'
 
 const navItens = [
   { label: 'Visão geral', rota: '/admin', fim: true, icone: '📊' },

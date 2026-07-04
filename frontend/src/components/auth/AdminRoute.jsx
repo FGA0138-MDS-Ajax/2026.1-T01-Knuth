@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { estaLogado, ehAdmin } from '../../config/auth'
+import { estaLogado, ehAdmin } from '../config/auth.js'
 
 // Protege as rotas do painel administrativo.
 // - Não logado  -> vai para o login.

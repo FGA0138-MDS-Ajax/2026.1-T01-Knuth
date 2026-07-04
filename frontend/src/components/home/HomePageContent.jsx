@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { apiUrl } from '../../config/api';
-import { getNomeUsuario } from '../../config/auth';
-import { getModulosConcluidos } from '../../config/progressoModulos';
-import { modulos } from '../../data/modulos';
+import { apiUrl } from '../config/api.js';
+import { getNomeUsuario } from '../config/auth.js';
+import { getModulosConcluidos } from '../config/progressoModulos.js';
+import { modulos } from '../../data/modulos/index.js';
 
 const linkInline =
   'font-medium text-emerald-700 underline decoration-emerald-300/80 underline-offset-[3px] decoration-1 hover:text-emerald-900 hover:decoration-emerald-500 transition-colors';

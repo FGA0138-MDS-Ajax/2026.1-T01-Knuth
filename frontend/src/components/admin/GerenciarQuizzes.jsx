@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import RecursoCrud from './RecursoCrud'
-import { adminApi } from '../../config/adminApi'
+import { adminApi } from '../config/adminApi.js'
 
 // Editor de alternativas de uma questão de quiz.
 // Controla dois campos do formulário ao mesmo tempo:

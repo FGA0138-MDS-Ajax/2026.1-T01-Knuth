@@ -13,8 +13,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { apiUrl } from '../../config/api';
-import Navbar from '../common/Navbar';
+import { apiUrl } from '../config/api.js';
+import Navbar from '../common/Navbar.jsx';
 
 ChartJS.register(
   CategoryScale,

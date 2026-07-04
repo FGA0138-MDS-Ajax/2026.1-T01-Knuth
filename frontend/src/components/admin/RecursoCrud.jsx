@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ErroAcessoNegado } from '../../config/adminApi'
+import { ErroAcessoNegado } from '../config/adminApi.js'
 
 // Componente genérico de CRUD para o painel admin.
 //

@@ -1,5 +1,5 @@
 import RecursoCrud from './RecursoCrud'
-import { adminApi } from '../../config/adminApi'
+import { adminApi } from '../config/adminApi.js'
 
 const brl = (v) =>
   v == null || v === ''
