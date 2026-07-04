@@ -5,13 +5,9 @@ O projeto está alocado na branch developer.
 Plataforma web responsiva voltada para **simulação de consumo energético residencial** e **educação ambiental**, desenvolvida na disciplina **Métodos de Desenvolvimento de Software (MDS)** – Turma 01, 2026.1.
 
 O projeto integra dois pilares principais:
-
-##  Objetivos
-- Permitir que famílias brasileiras compreendam e controlem seu consumo de energia elétrica mensalmente.
-- Apoiar educadores e estudantes com recursos pedagógicos práticos e interativos.
-- Incentivar hábitos sustentáveis por meio de tecnologias com feedback visual.
-- Garantir acessibilidade e responsividade em qualquer dispositivo.
-
+-  **Simulação e Controle**: cálculo de consumo e custo de aparelhos elétricos.
+-  **Educação Ambiental**: conteúdos interativos sobre eficiência energética e fontes renováveis.
+  
 ---
 
 ## Objetivos
