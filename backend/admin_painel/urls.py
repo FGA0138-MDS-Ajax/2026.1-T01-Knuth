@@ -2,6 +2,11 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
+
+    # Adiciona esta linha para que o Django reconheça as rotas do admin_painel
+    path('api/admin/', include('admin_painel.urls')),
+
     # Bandeiras tarifárias
     path('bandeiras/', views.bandeiras_list, name='admin-bandeiras-list'),
     path('bandeiras/<int:pk>/', views.bandeiras_detail, name='admin-bandeiras-detail'),
