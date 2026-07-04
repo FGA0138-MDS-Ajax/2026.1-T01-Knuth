@@ -13,9 +13,9 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { apiUrl } from '../../config/api';
-import Navbar from '../common/Navbar';
-import { desbloquearEmblema } from '../../config/emblemas';
+import { apiUrl } from '../config/api.js';
+import Navbar from '../common/Navbar.jsx';
+import { desbloquearEmblema } from '../config/emblemas.js';
 
 ChartJS.register(
   CategoryScale,

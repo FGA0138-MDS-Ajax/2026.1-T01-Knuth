@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { apiUrl } from '../../config/api';
-import { encerrarSessao, getNomeUsuario } from '../../config/auth';
-import EducaEnergiaLogo from '../auth/EducaEnergiaLogo';
-import MeusEmblemasModal from './MeusEmblemasModal';
+import { apiUrl } from '../config/api.js';
+import { encerrarSessao, getNomeUsuario, ehAdmin } from '../config/auth.js';
+import EducaEnergiaLogo from '../auth/EducaEnergiaLogo.jsx';
+import MeusEmblemasModal from './MeusEmblemasModal.jsx';
 import EmblemaToast from './EmblemaToast';
 
 const containerNav = 'w-full px-5 sm:px-8 lg:px-12 xl:px-16';
@@ -22,6 +22,10 @@ const gruposMenu = [
     ],
   },
   {
+    titulo: 'Acompanhar',
+    itens: [{ label: 'Relatórios e Histórico', rota: '/relatorios' }],
+  },
+  {
     titulo: 'Aprender',
     itens: [{ label: 'Módulos educativos', rota: '/ListaModulos' }],
   },
@@ -37,6 +41,7 @@ const linksDesktop = [
   { label: 'Simulação', rota: '/consumo-medio' },
   { label: 'Eletrodomésticos', rota: '/eletrodomesticos' },
   { label: 'Análise', rota: '/rf05' },
+  { label: 'Relatórios', rota: '/relatorios' },
   { label: 'Aprendizagem', rota: '/ListaModulos' },
 ];
 
@@ -48,6 +53,7 @@ function Navbar() {
   const [modalEmblemasAberto, setModalEmblemasAberto] = useState(false);
   const nomeUsuario = getNomeUsuario() || 'Visitante';
   const inicial = nomeUsuario.charAt(0).toUpperCase();
+  const admin = ehAdmin();
 
   const fecharMenu = () => setMenuAberto(false);
   const fecharMenuUsuario = () => setMenuUsuarioAberto(false);
@@ -105,6 +111,16 @@ function Navbar() {
             </Link>
           ))}
         </div>
+
+        {admin && (
+            <Link
+              to="/admin"
+              className="ml-1 inline-flex items-center gap-1.5 rounded-md bg-amber-100 px-3 py-2 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-200"
+            >
+              <span aria-hidden>⚡</span>
+              Painel Admin
+            </Link>
+          )}
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-4">
           <div className="relative hidden md:block">

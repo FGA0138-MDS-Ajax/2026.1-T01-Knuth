@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'consumo',
     'educacao',
     'emblemas',
+    'admin_painel'
 ]
 
 MIDDLEWARE = [

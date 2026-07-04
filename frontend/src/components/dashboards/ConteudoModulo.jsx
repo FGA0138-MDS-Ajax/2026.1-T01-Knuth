@@ -1,5 +1,5 @@
 import React from 'react';
-import { desbloquearEmblema } from '../../config/emblemas';
+import { desbloquearEmblema } from '../config/emblemas.js';
 
 export function renderTextoComNegrito(texto) {
   const partes = texto.split(/(\*\*[^*]+\*\*)/g);

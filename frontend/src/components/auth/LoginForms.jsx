@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { apiUrl } from '../../config/api'
-import { salvarSessao } from '../../config/auth'
+import { apiUrl } from '../config/api.js'
+import { salvarSessao } from '../config/auth.js'
 
 export default function LoginForms() {
   const navigate = useNavigate()
@@ -41,8 +41,9 @@ export default function LoginForms() {
         throw new Error(dados.erro || 'Nome de usuário ou senha inválidos.')
       }
 
-      // Alteração: captura o nome real enviado pelo backend ou usa o username como fallback
-      salvarSessao(dados.usuario.nome || dados.usuario.username)
+      const isAdmin = dados.usuario?.is_staff || false;
+      salvarSessao(dados.usuario.nome || dados.usuario.username, isAdmin);
+
       navigate('/home', { replace: true, state: { usuario: dados.usuario } })
     } catch (error) {
       setErro(

@@ -4,7 +4,7 @@ import {
   EMBLEMAS,
   getEmblemasDesbloqueados,
   sincronizarEmblemasDoServidor,
-} from '../../config/emblemas';
+} from '../config/emblemas.js';
 
 /**
  * Modal "Meus Emblemas" — grade com todos os emblemas do RF08.

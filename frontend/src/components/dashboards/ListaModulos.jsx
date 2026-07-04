@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Navbar from '../common/Navbar';
 import { Link } from 'react-router-dom';
-import { modulos } from '../../data/modulos';
-import { getModulosConcluidos, sincronizarProgressoDoServidor } from '../../config/progressoModulos';
+import { modulos } from '../../data/modulos/index.js';
+import { getModulosConcluidos, sincronizarProgressoDoServidor } from '../config/progressoModulos.js';
 
 export default function ListaModulos() {
   // Estado dos IDs concluídos — inicializa com o cache local (sem latência)

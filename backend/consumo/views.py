@@ -1,10 +1,12 @@
 import json
 import logging
-import unicodedata  #para resolver os problemas de acentos e caracteres especiais na busca de eletrodomésticos
-from decimal import Decimal
+import unicodedata  # para resolver os problemas de acentos e caracteres especiais na busca de eletrodomésticos
+from collections import OrderedDict
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 from django.db import DatabaseError
 from django.http import JsonResponse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
@@ -14,7 +16,14 @@ from emblemas.services import desbloquear_varios, emblemas_por_consumos
 
 logger = logging.getLogger(__name__)
 
-def serializar_decimal(valor): #função fica
+TARIFA_REFERENCIA_KWH = Decimal("0.85")
+MESES_PT_BR = [
+    "jan", "fev", "mar", "abr", "mai", "jun",
+    "jul", "ago", "set", "out", "nov", "dez",
+]
+
+
+def serializar_decimal(valor):  # função fica
     if isinstance(valor, Decimal):
         return str(valor)
     if isinstance(valor, dict):
@@ -26,18 +35,53 @@ def serializar_decimal(valor): #função fica
         return [serializar_decimal(item) for item in valor]
     return valor
 
+
 def carregar_json(request):
     try:
         return json.loads(request.body.decode("utf-8") or "{}")
     except json.JSONDecodeError:
         raise CalculoEnergeticoError("JSON inválido.")
 
+
+def calcular_custo_estimado_reais(consumo_kwh):
+    """Calcula e arredonda o gasto estimado mensal para persistência no banco."""
+    try:
+        consumo = Decimal(str(consumo_kwh))
+    except (InvalidOperation, TypeError, ValueError):
+        consumo = Decimal("0")
+
+    return (consumo * TARIFA_REFERENCIA_KWH).quantize(
+        Decimal("0.01"),
+        rounding=ROUND_HALF_UP,
+    )
+
+
+def rotulo_mes_pt_br(data):
+    mes = MESES_PT_BR[data.month - 1]
+    ano = str(data.year)[-2:]
+    return f"{mes}/{ano}"
+
+
+def serializar_simulacao(simulacao):
+    return {
+        "id": simulacao.id,
+        "titulo": simulacao.titulo,
+        "meses_analisados": simulacao.meses_analisados,
+        "total_consumo_mensal_kwh": str(simulacao.total_consumo_mensal_kwh),
+        "consumo_medio_mensal_kwh": str(simulacao.consumo_medio_mensal_kwh),
+        "custo_estimado_reais": str(simulacao.custo_estimado_reais),
+        "status_consumo": simulacao.status_consumo,
+        "recomendacao": simulacao.recomendacao,
+        "criado_em": simulacao.criado_em.isoformat(),
+    }
+
+
 @csrf_exempt
 @require_http_methods(["POST"])
 def calcular_media_mensal_view(request):
     try:
         dados = carregar_json(request)
-        ##chama o calculo correto
+        # chama o cálculo correto
         consumos = dados.get("consumos")
         resultado = MotorCalculoEnergetico.calcular_media_mensal(
             consumos_mensais_kwh=consumos
@@ -65,6 +109,7 @@ def calcular_media_mensal_view(request):
             status=400,
         )
 
+
 @csrf_exempt
 @require_http_methods(["POST"])
 def criar_simulacao_view(request):
@@ -87,19 +132,24 @@ def criar_simulacao_view(request):
             consumos_mensais_kwh=consumos
         )
 
-        # Usamos .get() com valores padrão seguros para evitar o KeyError de vez
+        consumo_medio = resultado.get("consumo_medio_mensal_kwh", Decimal("0.00"))
+        custo_estimado = calcular_custo_estimado_reais(consumo_medio)
+
+        # RF09: a simulação salva recebe data automática pelo campo criado_em
+        # e custo estimado persistido, para o relatório refletir dados do banco.
         simulacao = SimulacaoConsumo.objects.create(
             usuario=request.user,
             titulo=titulo,
             meses_analisados=resultado.get("meses_analisados", len(consumos) if consumos else 0),
             total_consumo_mensal_kwh=resultado.get("consumo_total_kwh", Decimal("0.00")),
-            consumo_medio_mensal_kwh=resultado.get("consumo_medio_mensal_kwh", Decimal("0.00")),
-
-            # Campos que não vêm da média mensal ganham um valor padrão seguro:
-            custo_estimado_reais=resultado.get("custo_estimado_reais", Decimal("0.00")),
+            consumo_medio_mensal_kwh=consumo_medio,
+            custo_estimado_reais=custo_estimado,
             status_consumo=resultado.get("status_consumo", "nao_avaliado"),
             recomendacao=resultado.get("recomendacao", "Simulação de média gerada com sucesso."),
         )
+
+        resultado["custo_estimado_reais"] = custo_estimado
+        resultado["tarifa_utilizada"] = TARIFA_REFERENCIA_KWH
 
         # RF08 — login para salvar simulação de consumo médio + redução de consumo.
         novos_emblemas = desbloquear_varios(request.user, ["simulacao_salva"])
@@ -147,23 +197,7 @@ def listar_minhas_simulacoes(request):
         )
 
     simulacoes = SimulacaoConsumo.objects.filter(usuario=request.user)
-
-    dados = []
-
-    for simulacao in simulacoes:
-        dados.append(
-            {
-                "id": simulacao.id,
-                "titulo": simulacao.titulo,
-                "meses_analisados": simulacao.meses_analisados,
-                "total_consumo_mensal_kwh": str(simulacao.total_consumo_mensal_kwh),
-                "consumo_medio_mensal_kwh": str(simulacao.consumo_medio_mensal_kwh),
-                "custo_estimado_reais": str(simulacao.custo_estimado_reais),
-                "status_consumo": simulacao.status_consumo,
-                "recomendacao": simulacao.recomendacao,
-                "criado_em": simulacao.criado_em.isoformat(),
-            }
-        )
+    dados = [serializar_simulacao(simulacao) for simulacao in simulacoes]
 
     return JsonResponse(
         {
@@ -174,7 +208,7 @@ def listar_minhas_simulacoes(request):
     )
 
 
-def normalizar_texto(texto): #função para normalizar o texto de busca, removendo acentos e caracteres especiais, e convertendo para minúsculas
+def normalizar_texto(texto):  # função para normalizar o texto de busca, removendo acentos e caracteres especiais, e convertendo para minúsculas
     texto = texto or ""
     texto = texto.strip().lower()
 
@@ -187,8 +221,8 @@ def normalizar_texto(texto): #função para normalizar o texto de busca, removen
 
     return texto_sem_acento
 
-##listar eletrodomesticos atualizado para RF04
 
+# listar eletrodomesticos atualizado para RF04
 @require_http_methods(["GET"])
 def listar_eletrodomesticos(request):
     # Lê o parâmetro "busca" — mesmo nome que o frontend envia
@@ -224,7 +258,7 @@ def listar_eletrodomesticos(request):
         calculo = MotorCalculoEnergetico.calcular_consumo_eletrodomestico(
             potencia_watts=eletrodomestico.potencia_media_watts,
             tempo_minutos=eletrodomestico.tempo_medio_uso_minutos,
-            tarifa_kwh=Decimal("0.85")
+            tarifa_kwh=TARIFA_REFERENCIA_KWH,
         )
 
         dados.append(
@@ -243,8 +277,17 @@ def listar_eletrodomesticos(request):
             }
         )
 
-    # RF08 — emblema opcional do catálogo do front: consultou eletrodomésticos.
-    novos_emblemas = desbloquear_varios(request.user, ["detetive_de_aparelhos"])
+    # RF08 — NÃO desbloquear o emblema aqui.
+    #
+    # Esta rota também é usada pela RF05 (Análise de Consumo) para carregar a
+    # lista de aparelhos com ?todos=true. Se o backend liberar o emblema nesta
+    # rota, o usuário ganha "Detetive de Aparelhos" apenas por abrir/usar a
+    # análise, mesmo sem visitar a tela de Eletrodomésticos.
+    #
+    # O desbloqueio correto já está no frontend da página de Eletrodomésticos:
+    # frontend/src/components/dashboards/PaginaEletrodomesticos.jsx
+    #   desbloquearEmblema('detetive_de_aparelhos')
+    novos_emblemas = []
 
     return JsonResponse(
         {
@@ -255,54 +298,202 @@ def listar_eletrodomesticos(request):
         status=200,
     )
 
-@csrf_exempt 
+
+@csrf_exempt
+@require_http_methods(["POST"])
 def analise_consumo_rf05(request):
-    if request.method == 'POST': ##enviar
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"ok": False, "erro": "Faça login para salvar e analisar seu consumo."},
+            status=401,
+        )
+
+    try:
+        dados = carregar_json(request)
+        consumo_real_kwh = dados.get("consumo_real_kwh")
+        ids_eletrodomesticos = dados.get("eletrodomesticos_selecionados", [])
+
+        # vazio ou nulo
+        if consumo_real_kwh is None or not ids_eletrodomesticos:
+            return JsonResponse(
+                {"ok": False, "erro": "Por favor, informe o consumo real e selecione pelo menos um aparelho."},
+                status=400,
+            )
+
         try:
-            dados = json.loads(request.body)
-            consumo_real_kwh = dados.get("consumo_real_kwh")
-            ids_eletrodomesticos = dados.get("eletrodomesticos_selecionados", [])
-
-            #vazio ou nulo
-            if consumo_real_kwh is None or not ids_eletrodomesticos:
-                return JsonResponse(
-                    {"erro": "Por favor, informe o consumo real e selecione pelo menos um aparelho."},
-                    status=400
-                )
-
-            # se e negativo ou se escrito por extenso
-            if float(consumo_real_kwh) <= 0:
-                return JsonResponse(
-                    {"erro": "O valor da conta de luz deve ser maior que zero."},
-                    status=400
-                )
-
-            #se tudo certo, entre no calculo
-            resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
-                consumo_real_kwh=consumo_real_kwh,
-                ids_eletrodomesticos=ids_eletrodomesticos
-            )
-
-            # RF08 — uso do simulador / análise de consumo.
-            novos_emblemas = desbloquear_varios(request.user, ["simulador_em_acao"])
-
+            consumo_real_decimal = Decimal(str(consumo_real_kwh))
+        except (InvalidOperation, TypeError, ValueError):
             return JsonResponse(
-                {"ok": True, "resultado": resultado, "novos_emblemas": novos_emblemas},
-                status=200,
+                {"ok": False, "erro": "Consumo inválido. Por favor, digite apenas valores entre 1 e 999 kWh"},
+                status=400,
             )
 
-        except ValueError:
-            #se não for numero real ou ultrassapar ou ser minimo no kWh
+        # se é negativo, zero ou está fora do intervalo esperado
+        if consumo_real_decimal <= 0:
             return JsonResponse(
-                {"erro": "Consumo inválido. Por favor, digite apenas valores entre 1 e 999 kWh"},
-                status=400
+                {"ok": False, "erro": "O valor da conta de luz deve ser maior que zero."},
+                status=400,
             )
 
-        except json.JSONDecodeError:
-            return JsonResponse({"erro": "Formato de JSON inválido enviado pelo Front-end."}, status=400)
-        except Exception as e:
-            return JsonResponse({"erro": str(e)}, status=500)
-            
-    # Se alguém tentar acessar a rota direto pelo navegador (que é um GET), retorna erro
-    return JsonResponse({"erro": "Método não permitido."}, status=405)
+        # se tudo certo, entra no cálculo
+        resultado = SimuladorRF05.gerar_analise_e_recomendacoes(
+            consumo_real_kwh=consumo_real_decimal,
+            ids_eletrodomesticos=ids_eletrodomesticos,
+        )
 
+        custo_estimado = calcular_custo_estimado_reais(consumo_real_decimal)
+
+        # RF09: toda análise da RF05 passa a ser persistida com criado_em.
+        # O relatório usa apenas registros vinculados ao request.user.
+        simulacao = SimulacaoConsumo.objects.create(
+            usuario=request.user,
+            titulo=dados.get("titulo") or "Análise de consumo",
+            meses_analisados=1,
+            total_consumo_mensal_kwh=consumo_real_decimal.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP),
+            consumo_medio_mensal_kwh=consumo_real_decimal.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP),
+            custo_estimado_reais=custo_estimado,
+            status_consumo=resultado.get("status_consumo", "nao_avaliado"),
+            recomendacao=resultado.get("recomendacao", ""),
+        )
+
+        resultado["consumo_real_kwh"] = consumo_real_decimal.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        resultado["custo_estimado_reais"] = custo_estimado
+        resultado["tarifa_utilizada"] = TARIFA_REFERENCIA_KWH
+
+        # RF08 — uso do simulador / análise de consumo.
+        novos_emblemas = desbloquear_varios(request.user, ["simulador_em_acao"])
+
+        return JsonResponse(
+            {
+                "ok": True,
+                "resultado": serializar_decimal(resultado),
+                "simulacao_id": simulacao.id,
+                "novos_emblemas": novos_emblemas,
+            },
+            status=201,
+        )
+
+    except ValueError:
+        # se não for número real, ultrapassar ou ser menor que o mínimo no kWh
+        return JsonResponse(
+            {"ok": False, "erro": "Consumo inválido. Por favor, digite apenas valores entre 1 e 999 kWh"},
+            status=400,
+        )
+    except CalculoEnergeticoError as erro:
+        return JsonResponse({"ok": False, "erro": str(erro)}, status=400)
+    except DatabaseError:
+        logger.exception("Falha ao persistir análise de consumo RF05")
+        return JsonResponse(
+            {"ok": False, "erro": "Erro interno ao salvar a análise de consumo."},
+            status=500,
+        )
+    except Exception as erro:
+        logger.exception("Falha inesperada na análise de consumo RF05")
+        return JsonResponse({"ok": False, "erro": str(erro)}, status=500)
+
+
+@require_http_methods(["GET"])
+def relatorio_gastos_view(request):
+    """
+    RF09 — Relatório de Gastos.
+
+    Retorna um JSON já pronto para gráficos:
+    - séries mensais de consumo;
+    - séries mensais de gasto estimado;
+    - variação percentual em relação ao mês anterior;
+    - histórico detalhado das simulações persistidas.
+
+    Segurança/QA: a consulta filtra sempre por usuario=request.user.
+    Assim, o Usuário A nunca recebe dados do Usuário B.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"ok": False, "erro": "Faça login para visualizar seu relatório."},
+            status=401,
+        )
+
+    simulacoes = list(
+        SimulacaoConsumo.objects
+        .filter(usuario=request.user)
+        .order_by("criado_em", "id")
+    )
+
+    meses = OrderedDict()
+
+    for simulacao in simulacoes:
+        criado_local = timezone.localtime(simulacao.criado_em)
+        chave = criado_local.strftime("%Y-%m")
+        rotulo = rotulo_mes_pt_br(criado_local)
+
+        if chave not in meses:
+            meses[chave] = {
+                "chave": chave,
+                "rotulo": rotulo,
+                "quantidade_simulacoes": 0,
+                "consumo_total": Decimal("0.00"),
+                "gasto_total": Decimal("0.00"),
+            }
+
+        meses[chave]["quantidade_simulacoes"] += 1
+        meses[chave]["consumo_total"] += Decimal(str(simulacao.consumo_medio_mensal_kwh or 0))
+        meses[chave]["gasto_total"] += Decimal(str(simulacao.custo_estimado_reais or 0))
+
+    series_mensais = []
+    consumo_mes_anterior = None
+
+    for mes in meses.values():
+        quantidade = Decimal(mes["quantidade_simulacoes"])
+        consumo_mensal = (mes["consumo_total"] / quantidade).quantize(
+            Decimal("0.01"),
+            rounding=ROUND_HALF_UP,
+        )
+        gasto_estimado = (mes["gasto_total"] / quantidade).quantize(
+            Decimal("0.01"),
+            rounding=ROUND_HALF_UP,
+        )
+
+        if consumo_mes_anterior and consumo_mes_anterior > 0:
+            variacao = ((consumo_mensal - consumo_mes_anterior) / consumo_mes_anterior * Decimal("100")).quantize(
+                Decimal("0.01"),
+                rounding=ROUND_HALF_UP,
+            )
+        else:
+            variacao = None
+
+        series_mensais.append(
+            {
+                "chave": mes["chave"],
+                "rotulo": mes["rotulo"],
+                "quantidade_simulacoes": mes["quantidade_simulacoes"],
+                "consumo_mensal_kwh": str(consumo_mensal),
+                "gasto_estimado_reais": str(gasto_estimado),
+                "variacao_percentual": str(variacao) if variacao is not None else None,
+            }
+        )
+        consumo_mes_anterior = consumo_mensal
+
+    historico = [serializar_simulacao(simulacao) for simulacao in reversed(simulacoes)]
+    ultimo_mes = series_mensais[-1] if series_mensais else None
+
+    return JsonResponse(
+        {
+            "ok": True,
+            "resumo": {
+                "total_simulacoes": len(simulacoes),
+                "total_meses_com_registro": len(series_mensais),
+                "consumo_ultimo_mes_kwh": ultimo_mes["consumo_mensal_kwh"] if ultimo_mes else "0.00",
+                "gasto_ultimo_mes_reais": ultimo_mes["gasto_estimado_reais"] if ultimo_mes else "0.00",
+                "variacao_ultimo_mes_percentual": ultimo_mes["variacao_percentual"] if ultimo_mes else None,
+            },
+            "graficos": {
+                "meses": [mes["rotulo"] for mes in series_mensais],
+                "consumo_mensal_kwh": [mes["consumo_mensal_kwh"] for mes in series_mensais],
+                "gastos_estimados_reais": [mes["gasto_estimado_reais"] for mes in series_mensais],
+                "variacao_percentual": [mes["variacao_percentual"] for mes in series_mensais],
+            },
+            "series_mensais": series_mensais,
+            "historico": historico,
+            "tarifa_referencia_kwh": str(TARIFA_REFERENCIA_KWH),
+        },
+        status=200,
+    )
