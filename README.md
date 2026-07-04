@@ -56,6 +56,7 @@ Fluxo básico:
 
 -   **Alicia Doralice de Medeiros Maia** – Product Owner (PO)
 -   **Angeline Izaura de Lima Melo** – Analista de Qualidade
+-   **Beatriz Brandão Fidelis Batista** – Desenvolvedora Backend
 -   **Bruno Ferreira Dornelas** – Desenvolvedor Backend
 -   **Caio Breno De Souza Bezerra** – Desenvolvedor Frontend
 -   **Danielly Reis dos Santos** – Desenvolvedora Backend

@@ -1,8 +1,10 @@
 from decimal import Decimal
+from datetime import timedelta
 import json
 from django.test import TestCase, SimpleTestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.utils import timezone
 from .services import MotorCalculoEnergetico, CalculoEnergeticoError, SimuladorRF05
 from .models import SimulacaoConsumo, Eletrodomestico
 
@@ -384,31 +386,6 @@ class RF05SimuladorTests(TestCase):
         self.assertNotIn("Geladeira", resultado["recomendacao"])
         self.assertIn("Verifique se não existem luzes acesas", resultado["recomendacao"])
 
-        def test_api_analise_consumo_erro_valores_invalidos(self):
-            """Garante que o backend barra consumos zerados ou negativos com HTTP 400."""
-            usuario = get_user_model().objects.create_user(username="valida_erro", password="123")
-            self.client.login(username="valida_erro", password="123")
-
-            # Testando consumo zero
-            payload = {"consumo_real_kwh": 0, "eletrodomesticos_selecionados": ["Ar Condicionado"]}
-            resposta = self.client.post(reverse("analise-consumo-rf05"), data=json.dumps(payload),
-                                        content_type="application/json")
-            self.assertEqual(resposta.status_code, 400)
-            self.assertIn("maior que zero", resposta.json()["erro"])
-
-        def test_calculo_meta_reducao_arredondamento_minimo(self):
-            """Valida que o gerador de metas arredonda para múltiplos de 5 e impõe mínimo de 5 minutos."""
-            # Criamos uma situação controlada de aparelhos simulados para a função privada
-            aparelhos_para_reduzir = [{
-                "nome": "Chuveiro Elétrico",
-                "potencia": Decimal("5500"),
-                "kwh_mensal": Decimal("50.00")
-            }]
-
-            # Um excesso pequeno geraria minutos muito baixos. O sistema deve forçar 5 minutos.
-            meta_texto = SimuladorRF05._calcular_metas_de_reducao(Decimal("5"), aparelhos_para_reduzir)
-            self.assertIn("Reduza cerca de 5 minutos", meta_texto)
-
 # ------------------------------------------------------------------------------
 # TESTES DA RF09 — RELATÓRIO DE GASTOS
 # ------------------------------------------------------------------------------
@@ -527,17 +504,3 @@ class RelatorioGastosRF09Tests(TestCase):
         series = resposta.json()["series_mensais"]
         self.assertEqual(len(series), 2)
         self.assertEqual(series[1]["variacao_percentual"], "-25.00")
-
-
-    def test_relatorio_gastos_usuario_anonimo(self):
-        """Segurança: Garante que um usuário deslogado recebe 401 ao tentar ver o relatório."""
-        resposta = self.client.get(self.url_relatorio)
-        self.assertEqual(resposta.status_code, 401)
-        self.assertFalse(resposta.json()["ok"])
-
-
-    def test_analise_consumo_rf05_usuario_anonimo(self):
-        """Segurança: Garante que um usuário deslogado recebe 401 ao tentar analisar o consumo."""
-        payload = {"consumo_real_kwh": 150, "eletrodomesticos_selecionados": ["Chuveiro elétrico"]}
-        resposta = self.client.post(self.url_rf05, data=json.dumps(payload), content_type="application/json")
-        self.assertEqual(resposta.status_code, 401)

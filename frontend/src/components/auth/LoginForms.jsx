@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { apiUrl } from '../../config/api'
-import { salvarSessao, extrairFlagAdmin } from '../../config/auth'
+import { salvarSessao } from '../../config/auth'
 
 export default function LoginForms() {
   const navigate = useNavigate()
@@ -42,13 +42,8 @@ export default function LoginForms() {
       }
 
       // Alteração: captura o nome real enviado pelo backend ou usa o username como fallback
-      const admin = extrairFlagAdmin(dados.usuario)
-      salvarSessao(dados.usuario.nome || dados.usuario.username, admin)
-      // Administradores caem direto no painel de gestão; usuários comuns na home.
-      navigate(admin ? '/admin' : '/home', {
-        replace: true,
-        state: { usuario: dados.usuario },
-      })
+      salvarSessao(dados.usuario.nome || dados.usuario.username)
+      navigate('/home', { replace: true, state: { usuario: dados.usuario } })
     } catch (error) {
       setErro(
         error.message === 'Failed to fetch'

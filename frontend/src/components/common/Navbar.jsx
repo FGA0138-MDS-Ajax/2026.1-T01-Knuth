@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { apiUrl } from '../../config/api';
-import { encerrarSessao, getNomeUsuario, ehAdmin } from '../../config/auth';
+import { encerrarSessao, getNomeUsuario } from '../../config/auth';
 import EducaEnergiaLogo from '../auth/EducaEnergiaLogo';
 import MeusEmblemasModal from './MeusEmblemasModal';
 import EmblemaToast from './EmblemaToast';
@@ -22,6 +22,10 @@ const gruposMenu = [
     ],
   },
   {
+    titulo: 'Acompanhar',
+    itens: [{ label: 'Relatórios e Histórico', rota: '/relatorios' }],
+  },
+  {
     titulo: 'Aprender',
     itens: [{ label: 'Módulos educativos', rota: '/ListaModulos' }],
   },
@@ -37,6 +41,7 @@ const linksDesktop = [
   { label: 'Simulação', rota: '/consumo-medio' },
   { label: 'Eletrodomésticos', rota: '/eletrodomesticos' },
   { label: 'Análise', rota: '/rf05' },
+  { label: 'Relatórios', rota: '/relatorios' },
   { label: 'Aprendizagem', rota: '/ListaModulos' },
 ];
 
@@ -48,7 +53,6 @@ function Navbar() {
   const [modalEmblemasAberto, setModalEmblemasAberto] = useState(false);
   const nomeUsuario = getNomeUsuario() || 'Visitante';
   const inicial = nomeUsuario.charAt(0).toUpperCase();
-  const admin = ehAdmin();
 
   const fecharMenu = () => setMenuAberto(false);
   const fecharMenuUsuario = () => setMenuUsuarioAberto(false);
@@ -105,15 +109,6 @@ function Navbar() {
               )}
             </Link>
           ))}
-          {admin && (
-            <Link
-              to="/admin"
-              className="ml-1 inline-flex items-center gap-1.5 rounded-md bg-amber-100 px-3 py-2 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-200"
-            >
-              <span aria-hidden>⚡</span>
-              Painel Admin
-            </Link>
-          )}
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-4">
@@ -154,20 +149,6 @@ function Navbar() {
                   role="menu"
                   className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl"
                 >
-                  {admin && (
-                    <>
-                      <Link
-                        to="/admin"
-                        role="menuitem"
-                        onClick={fecharMenuUsuario}
-                        className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-50"
-                      >
-                        <span aria-hidden>⚡</span>
-                        Painel administrativo
-                      </Link>
-                      <div className="my-1 border-t border-slate-100" />
-                    </>
-                  )}
                   <button
                     type="button"
                     role="menuitem"
@@ -223,16 +204,6 @@ function Navbar() {
           />
           <div className="lg:hidden fixed top-[4.5rem] right-0 z-50 h-[calc(100vh-4.5rem)] w-80 max-w-[90vw] bg-white border-l border-slate-200 shadow-2xl overflow-y-auto">
             <div className="p-6 space-y-8">
-              {admin && (
-                <Link
-                  to="/admin"
-                  onClick={fecharMenu}
-                  className="flex items-center gap-2.5 rounded-lg bg-amber-100 px-3 py-3 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-200"
-                >
-                  <span aria-hidden>⚡</span>
-                  Painel administrativo
-                </Link>
-              )}
               {gruposMenu.map((grupo) => (
                 <div key={grupo.titulo}>
                   <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">

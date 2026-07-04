@@ -3,6 +3,7 @@
 import os
 import sys
 
+## necessidade de modificação aleatoria para solução de bug
 
 def main():
     """Run administrative tasks."""
