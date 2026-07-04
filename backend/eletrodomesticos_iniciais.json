@@ -1,0 +1,277 @@
+[
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 1,
+    "fields": {
+      "nome": "Geladeira",
+      "potencia_media_watts": 250,
+      "tempo_medio_uso_minutos": 480,
+      "descricao_uso": "Compressor ligado cerca de 8h/dia para manter a temperatura nas 24h",
+      "destaque": true
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 2,
+    "fields": {
+      "nome": "Refrigerador (Duplex)",
+      "potencia_media_watts": 350,
+      "tempo_medio_uso_minutos": 480,
+      "descricao_uso": "Compressor ligado cerca de 8h/dia para manter a temperatura nas 24h",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 3,
+    "fields": {
+      "nome": "Fogão Elétrico / Cooktop",
+      "potencia_media_watts": 1500,
+      "tempo_medio_uso_minutos": 45,
+      "descricao_uso": "Uso diário para preparo de refeições",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 4,
+    "fields": {
+      "nome": "Micro-ondas",
+      "potencia_media_watts": 1200,
+      "tempo_medio_uso_minutos": 20,
+      "descricao_uso": "Aquecimento rápido de refeições no dia a dia",
+      "destaque": true
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 5,
+    "fields": {
+      "nome": "Máquina de lavar roupa",
+      "potencia_media_watts": 500,
+      "tempo_medio_uso_minutos": 60,
+      "descricao_uso": "Média diária baseada em 3 a 4 lavagens por semana",
+      "destaque": true
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 6,
+    "fields": {
+      "nome": "Máquina de lavar louça",
+      "potencia_media_watts": 1500,
+      "tempo_medio_uso_minutos": 40,
+      "descricao_uso": "Média baseada em uso quase diário de ciclos curtos",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 7,
+    "fields": {
+      "nome": "Air fryer",
+      "potencia_media_watts": 1500,
+      "tempo_medio_uso_minutos": 30,
+      "descricao_uso": "Uso para preparo rápido de alimentos",
+      "destaque": true
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 8,
+    "fields": {
+      "nome": "Liquidificador",
+      "potencia_media_watts": 300,
+      "tempo_medio_uso_minutos": 5,
+      "descricao_uso": "Uso rápido para sucos ou vitaminas",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 9,
+    "fields": {
+      "nome": "Sanduicheira",
+      "potencia_media_watts": 750,
+      "tempo_medio_uso_minutos": 15,
+      "descricao_uso": "Uso típico de café da manhã ou lanche",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 10,
+    "fields": {
+      "nome": "Filtro de Água (Gelada)",
+      "potencia_media_watts": 100,
+      "tempo_medio_uso_minutos": 120,
+      "descricao_uso": "Tempo de compressão/refrigeração diário",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 11,
+    "fields": {
+      "nome": "Ferro de passar",
+      "potencia_media_watts": 1000,
+      "tempo_medio_uso_minutos": 20,
+      "descricao_uso": "Média diária diluída (passar roupas da semana)",
+      "destaque": true
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 12,
+    "fields": {
+      "nome": "Aspirador de pó",
+      "potencia_media_watts": 1000,
+      "tempo_medio_uso_minutos": 15,
+      "descricao_uso": "Uso comum no período de seca/poeira no DF",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 13,
+    "fields": {
+      "nome": "Ventilador",
+      "potencia_media_watts": 100,
+      "tempo_medio_uso_minutos": 480,
+      "descricao_uso": "8 horas de uso durante as noites quentes",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 14,
+    "fields": {
+      "nome": "Ar condicionado",
+      "potencia_media_watts": 1500,
+      "tempo_medio_uso_minutos": 480,
+      "descricao_uso": "Pico de uso noturno (8 horas) na época da seca no DF",
+      "destaque": true
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 15,
+    "fields": {
+      "nome": "Chuveiro Elétrico",
+      "potencia_media_watts": 5500,
+      "tempo_medio_uso_minutos": 40,
+      "descricao_uso": "Equivalente a 2-3 banhos por dia na casa",
+      "destaque": true
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 16,
+    "fields": {
+      "nome": "Secador de cabelo",
+      "potencia_media_watts": 1500,
+      "tempo_medio_uso_minutos": 15,
+      "descricao_uso": "Uso esporádico médio diário",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 17,
+    "fields": {
+      "nome": "Televisão",
+      "potencia_media_watts": 150,
+      "tempo_medio_uso_minutos": 300,
+      "descricao_uso": "Média de 5 horas de tela ligada na sala/quarto",
+      "destaque": true
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 18,
+    "fields": {
+      "nome": "Computador / PC Gamer",
+      "potencia_media_watts": 400,
+      "tempo_medio_uso_minutos": 360,
+      "descricao_uso": "Uso de 6 horas para trabalho ou jogos",
+      "destaque": true
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 19,
+    "fields": {
+      "nome": "Monitor",
+      "potencia_media_watts": 50,
+      "tempo_medio_uso_minutos": 360,
+      "descricao_uso": "Uso de 6 horas para trabalho ou jogos",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 20,
+    "fields": {
+      "nome": "Carregadores de Celular",
+      "potencia_media_watts": 15,
+      "tempo_medio_uso_minutos": 240,
+      "descricao_uso": "Soma de 4 horas de carregamento de dispositivos",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 21,
+    "fields": {
+      "nome": "Videogame",
+      "potencia_media_watts": 200,
+      "tempo_medio_uso_minutos": 120,
+      "descricao_uso": "Média de 2 horas de jogo diário",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 22,
+    "fields": {
+      "nome": "Roteador Wifi",
+      "potencia_media_watts": 10,
+      "tempo_medio_uso_minutos": 1440,
+      "descricao_uso": "Ligado continuamente (24 horas)",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 23,
+    "fields": {
+      "nome": "Notebook",
+      "potencia_media_watts": 65,
+      "tempo_medio_uso_minutos": 480,
+      "descricao_uso": "Trabalho ou estudo (8 horas diárias)",
+      "destaque": false
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 24,
+    "fields": {
+      "nome": "Lâmpadas LED (Casa toda)",
+      "potencia_media_watts": 60,
+      "tempo_medio_uso_minutos": 300,
+      "descricao_uso": "Média de 5 horas de iluminação ativada por dia",
+      "destaque": true
+    }
+  },
+  {
+    "model": "consumo.eletrodomestico",
+    "pk": 25,
+    "fields": {
+      "nome": "Abajur / Luminária",
+      "potencia_media_watts": 10,
+      "tempo_medio_uso_minutos": 120,
+      "descricao_uso": "Leitura noturna (2 horas)",
+      "destaque": false
+    }
+  }
+]
